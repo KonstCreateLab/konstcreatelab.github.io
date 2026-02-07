@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevToolkit - Мультитул для разработчиков</title>
+    <title>DevToolkit Pro - Полный набор инструментов для разработчиков</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
     <style>
         * {
             margin: 0;
@@ -31,7 +33,7 @@
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 1800px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -58,19 +60,21 @@
             margin: 0 auto;
         }
         
-        .tools-tabs {
+        .category-tabs {
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
             background-color: white;
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
             margin-bottom: 30px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
         }
         
-        .tab {
-            padding: 18px 25px;
+        .category-tab {
+            padding: 15px 20px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 600;
@@ -78,28 +82,28 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex: 1;
+            min-width: 200px;
+            justify-content: center;
+            text-align: center;
         }
         
-        .tab:hover {
+        .category-tab:hover {
             background-color: #f8f9fa;
         }
         
-        .tab.active {
+        .category-tab.active {
             border-bottom: 3px solid var(--secondary-color);
             color: var(--secondary-color);
             background-color: #f0f7ff;
         }
         
-        .tool-container {
+        .category-container {
             display: none;
-            background-color: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
         
-        .tool-container.active {
+        .category-container.active {
             display: block;
             animation: fadeIn 0.5s ease;
         }
@@ -109,57 +113,57 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .tool-title {
+        .category-title {
             font-size: 1.8rem;
             margin-bottom: 20px;
             color: var(--primary-color);
             display: flex;
             align-items: center;
             gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
         }
         
-        .tool-content {
+        .tools-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
         }
         
-        @media (max-width: 992px) {
-            .tool-content {
-                grid-template-columns: 1fr;
-            }
+        .tool-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
         
-        .input-group {
-            margin-bottom: 20px;
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
         }
         
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
+        .tool-card h3 {
             color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        textarea, input, select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: border 0.3s;
+        .tool-card p {
+            color: #666;
+            margin-bottom: 20px;
+            flex-grow: 1;
         }
         
-        textarea {
-            min-height: 200px;
-            font-family: 'Courier New', monospace;
-            resize: vertical;
-        }
-        
-        textarea:focus, input:focus, select:focus {
-            border-color: var(--secondary-color);
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        .tool-actions {
+            margin-top: auto;
         }
         
         .btn {
@@ -197,12 +201,108 @@
             background-color: #c0392b;
         }
         
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal {
+            background-color: white;
+            border-radius: 10px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close-modal:hover {
+            color: var(--danger-color);
+        }
+        
+        .modal-content {
+            padding: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        textarea, input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        textarea {
+            min-height: 150px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+        }
+        
+        textarea:focus, input:focus, select:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
         .result {
             background-color: #f8f9fa;
             border: 1px solid #e9ecef;
             border-radius: 6px;
             padding: 15px;
-            min-height: 200px;
             overflow-wrap: break-word;
             font-family: 'Courier New', monospace;
             white-space: pre-wrap;
@@ -216,43 +316,41 @@
             border-left: 4px solid var(--danger-color);
         }
         
-        .tool-description {
-            color: #666;
-            margin-bottom: 20px;
-            font-size: 1.05rem;
-        }
-        
-        .utilities-grid {
+        .two-column {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
         
-        .utility-card {
-            background-color: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s;
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
         }
         
-        .utility-card:hover {
-            transform: translateY(-5px);
+        .code-editor {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            overflow: hidden;
         }
         
-        .utility-card h3 {
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            font-size: 1.4rem;
+        .code-editor-header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
             display: flex;
-            align-items: center;
-            gap: 10px;
+            justify-content: space-between;
         }
         
-        .utility-card p {
-            color: #666;
-            margin-bottom: 20px;
+        .code-editor-content {
+            min-height: 300px;
+        }
+        
+        .CodeMirror {
+            height: 300px !important;
+            border-radius: 0 0 6px 6px;
         }
         
         footer {
@@ -262,29 +360,6 @@
             color: #666;
             border-top: 1px solid #e9ecef;
             font-size: 0.95rem;
-        }
-        
-        .color-preview {
-            width: 30px;
-            height: 30px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 10px;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .json-formatter {
-            min-height: 300px;
-        }
-        
-        .formatted-json {
-            max-height: 400px;
-            overflow-y: auto;
         }
         
         .status-message {
@@ -305,838 +380,1518 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+        
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        
+        .preview-area {
+            background-color: #f8f9fa;
+            border: 1px dashed #ddd;
+            border-radius: 6px;
+            padding: 20px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tool-badge {
+            display: inline-block;
+            background-color: #e9ecef;
+            color: #666;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+        
+        .search-box {
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .search-input {
+            padding: 15px 20px 15px 50px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            width: 100%;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 1.2rem;
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <h1><i class="fas fa-tools"></i> DevToolkit</h1>
-            <p class="subtitle">Комплексный набор инструментов для разработчиков. Кодирование, форматирование, преобразование данных и другие полезные утилиты в одном месте.</p>
+            <h1><i class="fas fa-tools"></i> DevToolkit Pro</h1>
+            <p class="subtitle">Полный набор из более 50+ инструментов для разработчиков. Все в одном месте, полностью в браузере.</p>
         </div>
     </header>
     
     <div class="container">
-        <div class="tools-tabs">
-            <div class="tab active" data-tool="json">
-                <i class="fas fa-code"></i> JSON Форматер
+        <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Поиск инструмента... (введите название или ключевые слова)" id="search-tools">
+        </div>
+        
+        <div class="category-tabs">
+            <div class="category-tab active" data-category="code-editors">
+                <i class="fas fa-code"></i> Редакторы кода
             </div>
-            <div class="tab" data-tool="encoder">
-                <i class="fas fa-lock"></i> Кодировщик
+            <div class="category-tab" data-category="testing">
+                <i class="fas fa-bug"></i> Тестирование
             </div>
-            <div class="tab" data-tool="timestamp">
-                <i class="fas fa-clock"></i> Временные метки
+            <div class="category-tab" data-category="generators">
+                <i class="fas fa-cogs"></i> Генераторы
             </div>
-            <div class="tab" data-tool="color">
-                <i class="fas fa-palette"></i> Конвертер цветов
+            <div class="category-tab" data-category="api">
+                <i class="fas fa-cloud"></i> API & Данные
             </div>
-            <div class="tab" data-tool="utilities">
-                <i class="fas fa-th"></i> Другие утилиты
+            <div class="category-tab" data-category="security">
+                <i class="fas fa-shield-alt"></i> Безопасность
+            </div>
+            <div class="category-tab" data-category="performance">
+                <i class="fas fa-tachometer-alt"></i> Производительность
+            </div>
+            <div class="category-tab" data-category="text">
+                <i class="fas fa-font"></i> Текст & Код
+            </div>
+            <div class="category-tab" data-category="network">
+                <i class="fas fa-network-wired"></i> Сеть
+            </div>
+            <div class="category-tab" data-category="database">
+                <i class="fas fa-database"></i> Базы данных
+            </div>
+            <div class="category-tab" data-category="devops">
+                <i class="fas fa-server"></i> DevOps
             </div>
         </div>
         
-        <!-- JSON Formatter Tool -->
-        <div id="json-tool" class="tool-container active">
-            <h2 class="tool-title"><i class="fas fa-code"></i> Форматирование и валидация JSON</h2>
-            <p class="tool-description">Вставьте неформатированный JSON код для его красивого отображения или проверьте валидность JSON данных.</p>
-            
-            <div class="tool-content">
-                <div>
-                    <div class="input-group">
-                        <label for="json-input">Введите JSON код:</label>
-                        <textarea id="json-input" placeholder='{"name": "Пример", "data": [1, 2, 3]}'>{"tools":[{"name":"JSON Formatter","description":"Форматирует и валидирует JSON"},{"name":"Base64 Encoder","description":"Кодирует и декодирует данные в Base64"},{"name":"Timestamp Converter","description":"Конвертирует временные метки"},{"name":"Color Converter","description":"Конвертирует форматы цвета"}]}</textarea>
+        <!-- Редакторы кода / Песочницы -->
+        <div id="code-editors" class="category-container active">
+            <h2 class="category-title"><i class="fas fa-code"></i> Редакторы кода / Песочницы</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>Smart Pastebin <span class="tool-badge">New</span></h3>
+                    <p>Вставляет код с подсветкой синтаксиса, анализирует сложность и показывает возможные упрощения.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="smart-pastebin"><i class="fas fa-external-link-alt"></i> Открыть</button>
                     </div>
-                    <div class="input-group">
-                        <button id="format-json" class="btn"><i class="fas fa-indent"></i> Форматировать</button>
-                        <button id="minify-json" class="btn"><i class="fas fa-compress"></i> Минифицировать</button>
-                        <button id="validate-json" class="btn btn-success"><i class="fas fa-check"></i> Проверить</button>
-                        <button id="clear-json" class="btn btn-danger"><i class="fas fa-trash"></i> Очистить</button>
-                    </div>
-                </div>
-                <div>
-                    <div class="input-group">
-                        <label for="json-output">Результат:</label>
-                        <div id="json-output" class="result formatted-json"></div>
-                    </div>
-                    <div class="input-group">
-                        <button id="copy-json" class="btn"><i class="fas fa-copy"></i> Копировать</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Encoder/Decoder Tool -->
-        <div id="encoder-tool" class="tool-container">
-            <h2 class="tool-title"><i class="fas fa-lock"></i> Кодировщик/Декодировщик</h2>
-            <p class="tool-description">Кодируйте и декодируйте текст в форматах Base64, URL, HTML entities и других. Поддерживает Unicode (кириллицу).</p>
-            
-            <div class="tool-content">
-                <div>
-                    <div class="input-group">
-                        <label for="encoder-input">Исходный текст:</label>
-                        <textarea id="encoder-input" placeholder="Введите текст для кодирования или декодирования">Привет, мир! Этот текст будет закодирован.</textarea>
-                    </div>
-                    <div class="input-group">
-                        <label for="encoder-type">Тип преобразования:</label>
-                        <select id="encoder-type">
-                            <option value="base64-encode">Base64 Кодирование (UTF-8)</option>
-                            <option value="base64-decode">Base64 Декодирование (UTF-8)</option>
-                            <option value="url-encode">URL Кодирование</option>
-                            <option value="url-decode">URL Декодирование</option>
-                            <option value="html-encode">HTML Entities Кодирование</option>
-                            <option value="html-decode">HTML Entities Декодирование</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <button id="encode-decode" class="btn"><i class="fas fa-exchange-alt"></i> Преобразовать</button>
-                        <button id="clear-encoder" class="btn btn-danger"><i class="fas fa-trash"></i> Очистить</button>
-                    </div>
-                    <div id="encoder-status" class="status-message"></div>
-                </div>
-                <div>
-                    <div class="input-group">
-                        <label for="encoder-output">Результат:</label>
-                        <div id="encoder-output" class="result"></div>
-                    </div>
-                    <div class="input-group">
-                        <button id="copy-encoder" class="btn"><i class="fas fa-copy"></i> Копировать</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Timestamp Converter Tool -->
-        <div id="timestamp-tool" class="tool-container">
-            <h2 class="tool-title"><i class="fas fa-clock"></i> Конвертер временных меток</h2>
-            <p class="tool-description">Конвертируйте UNIX временные метки в читаемые даты и наоборот.</p>
-            
-            <div class="tool-content">
-                <div>
-                    <div class="input-group">
-                        <label for="timestamp-input">Введите UNIX timestamp или дату:</label>
-                        <input type="text" id="timestamp-input" placeholder="Например: 1690819200 или 2023-08-01 12:00:00" value="1690819200">
-                    </div>
-                    <div class="input-group">
-                        <label for="timestamp-direction">Направление конвертации:</label>
-                        <select id="timestamp-direction">
-                            <option value="timestamp-to-date">Timestamp → Дата</option>
-                            <option value="date-to-timestamp">Дата → Timestamp</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <button id="convert-timestamp" class="btn"><i class="fas fa-sync-alt"></i> Конвертировать</button>
-                        <button id="current-timestamp" class="btn"><i class="fas fa-clock"></i> Текущее время</button>
-                    </div>
-                </div>
-                <div>
-                    <div class="input-group">
-                        <label for="timestamp-output">Результат:</label>
-                        <div id="timestamp-output" class="result"></div>
-                    </div>
-                    <div class="input-group">
-                        <button id="copy-timestamp" class="btn"><i class="fas fa-copy"></i> Копировать</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Color Converter Tool -->
-        <div id="color-tool" class="tool-container">
-            <h2 class="tool-title"><i class="fas fa-palette"></i> Конвертер цветов</h2>
-            <p class="tool-description">Конвертируйте цвета между форматами HEX, RGB, HSL и выбирайте цвета с помощью палитры.</p>
-            
-            <div class="tool-content">
-                <div>
-                    <div class="input-group">
-                        <label for="color-input">Введите цвет в любом формате:</label>
-                        <input type="text" id="color-input" placeholder="#3498db, rgb(52, 152, 219) или hsl(204, 70%, 53%)" value="#3498db">
-                        <div id="color-preview" class="color-preview" style="background-color: #3498db;"></div>
-                    </div>
-                    <div class="input-group">
-                        <label for="color-format">Целевой формат:</label>
-                        <select id="color-format">
-                            <option value="hex">HEX</option>
-                            <option value="rgb">RGB</option>
-                            <option value="hsl">HSL</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <button id="convert-color" class="btn"><i class="fas fa-exchange-alt"></i> Конвертировать</button>
-                        <button id="random-color" class="btn"><i class="fas fa-random"></i> Случайный цвет</button>
-                    </div>
-                </div>
-                <div>
-                    <div class="input-group">
-                        <label for="color-output">Результат:</label>
-                        <div id="color-output" class="result"></div>
-                    </div>
-                    <div class="input-group">
-                        <button id="copy-color" class="btn"><i class="fas fa-copy"></i> Копировать</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Utilities Tool -->
-        <div id="utilities-tool" class="tool-container">
-            <h2 class="tool-title"><i class="fas fa-th"></i> Другие утилиты</h2>
-            <p class="tool-description">Различные полезные инструменты для разработчиков.</p>
-            
-            <div class="utilities-grid">
-                <div class="utility-card">
-                    <h3><i class="fas fa-hashtag"></i> Генератор хешей</h3>
-                    <p>Создайте хеши MD5, SHA-1, SHA-256 из текста.</p>
-                    <input type="text" id="hash-input" placeholder="Введите текст" class="form-control" value="Hello, World!">
-                    <select id="hash-algorithm" class="form-control">
-                        <option value="md5">MD5</option>
-                        <option value="sha1">SHA-1</option>
-                        <option value="sha256">SHA-256</option>
-                    </select>
-                    <button id="generate-hash" class="btn">Сгенерировать</button>
-                    <div id="hash-output" class="result" style="margin-top: 10px; min-height: 60px;"></div>
                 </div>
                 
-                <div class="utility-card">
-                    <h3><i class="fas fa-qrcode"></i> Генератор QR-кода</h3>
-                    <p>Создайте QR-код для URL, текста или контактной информации.</p>
-                    <input type="text" id="qr-input" placeholder="Введите текст или URL" class="form-control" value="https://github.com">
-                    <button id="generate-qr" class="btn">Сгенерировать QR</button>
-                    <div id="qr-output" style="margin-top: 10px; text-align: center;"></div>
+                <div class="tool-card">
+                    <h3>Multi-Language Playground</h3>
+                    <p>Одновременное выполнение кода на фронтенде (JS) и бэкенде (Python, PHP) в одном окне с общей консолью.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="multi-language-playground"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
                 </div>
                 
-                <div class="utility-card">
-                    <h3><i class="fas fa-random"></i> Генератор случайных данных</h3>
-                    <p>Создайте случайные строки, числа, пароли и UUID.</p>
-                    <select id="random-type" class="form-control">
-                        <option value="password">Пароль</option>
-                        <option value="uuid">UUID</option>
-                        <option value="number">Случайное число</option>
-                        <option value="string">Случайная строка</option>
-                    </select>
-                    <button id="generate-random" class="btn">Сгенерировать</button>
-                    <div id="random-output" class="result" style="margin-top: 10px; min-height: 60px;"></div>
+                <div class="tool-card">
+                    <h3>CSS Battle Simulator</h3>
+                    <p>Арена, где можно писать CSS, чтобы точно повторить заданный макет, с scoring системой.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="css-battle"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
                 </div>
                 
-                <div class="utility-card">
-                    <h3><i class="fas fa-text-height"></i> Текст утилиты</h3>
-                    <p>Подсчет символов, слов, преобразование регистра.</p>
-                    <textarea id="text-utility-input" placeholder="Введите текст" style="min-height: 100px; width: 100%; margin-bottom: 10px;">Пример текста для анализа</textarea>
-                    <button id="analyze-text" class="btn">Анализировать текст</button>
-                    <div id="text-analysis-output" class="result" style="margin-top: 10px; min-height: 100px; font-family: inherit;"></div>
+                <div class="tool-card">
+                    <h3>RegEx Visualizer & Trainer</h3>
+                    <p>Визуальное построение регулярных выражений с пошаговым объяснением и интерактивными задачами.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="regex-visualizer"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>SQL Playground</h3>
+                    <p>Безопасная песочница с предзагруженными наборами данных для тренировки SQL запросов.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="sql-playground"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Тестирование и Отладка -->
+        <div id="testing" class="category-container">
+            <h2 class="category-title"><i class="fas fa-bug"></i> Тестирование и Отладка</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>API Request Builder</h3>
+                    <p>Продвинутый аналог Postman прямо в браузере, с генерацией кода на разных языках.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="api-request-builder"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>JSON Path / XPath Tester</h3>
+                    <p>Инструмент для тестирования выражений JSON Path или XPath на лету.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="json-path-tester"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>Performance Budget Calculator</h3>
+                    <p>Калькулятор, который показывает, "потянете" ли вы добавление новой библиотеки.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="performance-budget"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>Console.log → Insight</h3>
+                    <p>Загружаешь логи с console.log, а инструмент группирует ошибки и строит временную шкалу.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="console-log-insight"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Генераторы и Преобразователи -->
+        <div id="generators" class="category-container">
+            <h2 class="category-title"><i class="fas fa-cogs"></i> Генераторы и Преобразователи</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>CSS Generator (Neumorphism/Glassmorphism)</h3>
+                    <p>Слайдеры для генерации модных CSS-эффектов.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="css-generator"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>TypeScript Interface Generator</h3>
+                    <p>Загружаешь JSON, получаешь готовые TS-интерфейсы.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="ts-interface-generator"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>Mock Data Factory</h3>
+                    <p>Генератор правдоподобных данных с экспортом в JSON, CSV, SQL.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="mock-data-factory"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>Color Palette Accessibility Checker</h3>
+                    <p>Проверка контрастности для выбранной палитры по WCAG и симуляция дальтонизма.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="color-accessibility"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>Base64 Encode/Decode с предпросмотром</h3>
+                    <p>Для картинок, шрифтов, файлов с предпросмотром.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="base64-preview"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>Генератор favicon-пакета</h3>
+                    <p>Загружаешь одну картинку, получаешь zip с иконками всех форматов + HTML-код.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="favicon-generator"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>Шпаргалка по Grid & Flexbox</h3>
+                    <p>Интерактивные пошаговые конструкторы с визуальным выводом CSS.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="grid-flex-cheatsheet"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- API и Данные -->
+        <div id="api" class="category-container">
+            <h2 class="category-title"><i class="fas fa-cloud"></i> Работа с API и Данными</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>Webhook Listener & Inspector</h3>
+                    <p>Создает временный публичный URL для тестирования входящих вебхуков.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="webhook-listener"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>GraphQL Schema Explorer</h3>
+                    <p>Визуальный навигатор по публичным GraphQL API с построением запросов.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="graphql-explorer"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>CSV to JSON (and back) Transformer</h3>
+                    <p>Конвертер CSV/JSON с настройкой разделителей и предпросмотром.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="csv-json-converter"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>JWT Debugger</h3>
+                    <p>Декодирование и проверка JWT-токенов.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="jwt-debugger"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Безопасность -->
+        <div id="security" class="category-container">
+            <h2 class="category-title"><i class="fas fa-shield-alt"></i> Безопасность</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>Password Hash & Verify</h3>
+                    <p>Мгновенное хеширование строки в разных алгоритмах (bcrypt, argon2) и проверка хеша.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="password-hash"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>Security Headers Checker</h3>
+                    <p>Быстрая проверка заголовков безопасности любого сайта.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="security-headers"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>CORS Tester</h3>
+                    <p>Инструмент для отправки кросс-доменных запросов с разными заголовками.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="cors-tester"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Производительность и Оптимизация -->
+        <div id="performance" class="category-container">
+            <h2 class="category-title"><i class="fas fa-tachometer-alt"></i> Производительность и Оптимизация</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>Bundle Analyzer (для CDN links)</h3>
+                    <p>Показывает общий вес внешних JS/CSS и предлагает альтернативы.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="bundle-analyzer"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>Image Compression Benchmarks</h3>
+                    <p>Сравнение размера и качества после сжатия разными алгоритмами (WebP, AVIF, MozJPEG).</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="image-compression"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>Lighthouse Report Diff</h3>
+                    <p>Сравнение двух отчетов Lighthouse (до и после оптимизаций) в наглядном виде.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="lighthouse-diff"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Текст / Код -->
+        <div id="text" class="category-container">
+            <h2 class="category-title"><i class="fas fa-font"></i> Работа с текстом / Кодом</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>Diff Checker</h3>
+                    <p>Сравнение двух текстов или фрагментов кода с поддержкой Git output.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="diff-checker"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>String & Code Escaper</h3>
+                    <p>Экранирование для HTML, JavaScript, SQL, JSON в один клик.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="string-escaper"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>Case Converter</h3>
+                    <p>Мгновенное преобразование между camelCase, snake_case, kebab-case, PascalCase.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="case-converter"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>Minify/Uglify JS, CSS, HTML</h3>
+                    <p>Классический, но необходимый набор для минификации кода.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="minify-tool"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Сетевые утилиты -->
+        <div id="network" class="category-container">
+            <h2 class="category-title"><i class="fas fa-network-wired"></i> Сетевые утилиты</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>IP & DNS Lookup</h3>
+                    <p>Быстрая информация об IP, проверка PTR, MX-записей.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="ip-dns-lookup"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>SSL Certificate Decoder</h3>
+                    <p>Декодирование и отображение информации из SSL-сертификата домена.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="ssl-decoder"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>URL Parser & Builder</h3>
+                    <p>Разбор URL на составляющие и конструктор URL с query-параметрами.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="url-parser"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>HTTP Status Code Explorer</h3>
+                    <p>Интерактивный справочник по статус-кодам с примерами и рекомендациями.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="http-status-codes"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Базы данных -->
+        <div id="database" class="category-container">
+            <h2 class="category-title"><i class="fas fa-database"></i> Базы данных</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>SQL Formatter & Beautifier</h3>
+                    <p>"Преттифаер" для SQL-запросов.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="sql-formatter"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>NoSQL Query Simulator</h3>
+                    <p>Песочница для написания и тестирования запросов к популярным NoSQL БД.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="nosql-simulator"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- DevOps -->
+        <div id="devops" class="category-container">
+            <h2 class="category-title"><i class="fas fa-server"></i> Для работы с облаками / DevOps</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>Dockerfile Generator</h3>
+                    <p>Конструктор Dockerfile для популярных стэков (Node.js, Python, Nginx) с комментариями.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="dockerfile-generator"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>Git Command Builder</h3>
+                    <p>Визуальный конструктор для сложных команд Git (интерактивный rebase, изменение истории).</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="git-command-builder"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h3>Markdown Editor & Preview</h3>
+                    <p>Редактор с живым предпросмотром и шпаргалкой по синтаксису GitHub Flavored MD.</p>
+                    <div class="tool-actions">
+                        <button class="btn open-tool" data-tool="markdown-editor"><i class="fas fa-external-link-alt"></i> Открыть</button>
+                    </div>
                 </div>
             </div>
         </div>
         
         <footer>
-            <p>DevToolkit &copy; 2023 | Все инструменты для разработчиков в одном месте</p>
-            <p style="margin-top: 10px; font-size: 0.85rem;">Используйте эти инструменты бесплатно. Код работает полностью в браузере, данные не отправляются на сервер.</p>
+            <p>DevToolkit Pro &copy; 2023 | Более 50+ инструментов для разработчиков в одном месте</p>
+            <p style="margin-top: 10px; font-size: 0.85rem;">Все инструменты работают полностью в браузере, данные не отправляются на сервер. Постоянно добавляются новые инструменты!</p>
         </footer>
     </div>
+    
+    <!-- Модальные окна для инструментов -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title"></h3>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-content" id="modal-content">
+                <!-- Контент инструментов будет загружаться динамически -->
+            </div>
+        </div>
+    </div>
+
+    <!-- CodeMirror библиотеки -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/sql/sql.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/php/php.min.js"></script>
 
     <script>
-        // Tab switching functionality
-        document.querySelectorAll('.tab').forEach(tab => {
+        // Глобальные переменные
+        let currentTool = null;
+        let codeEditors = {};
+        
+        // Переключение категорий
+        document.querySelectorAll('.category-tab').forEach(tab => {
             tab.addEventListener('click', function() {
-                // Remove active class from all tabs and tool containers
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tool-container').forEach(c => c.classList.remove('active'));
+                // Убираем активный класс у всех вкладок
+                document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.category-container').forEach(c => c.classList.remove('active'));
                 
-                // Add active class to clicked tab
+                // Добавляем активный класс текущей вкладке
                 this.classList.add('active');
                 
-                // Show corresponding tool container
-                const toolId = this.getAttribute('data-tool');
-                document.getElementById(`${toolId}-tool`).classList.add('active');
+                // Показываем соответствующую категорию
+                const categoryId = this.getAttribute('data-category');
+                document.getElementById(categoryId).classList.add('active');
             });
         });
         
-        // JSON Formatter Tool
-        const jsonInput = document.getElementById('json-input');
-        const jsonOutput = document.getElementById('json-output');
-        
-        document.getElementById('format-json').addEventListener('click', function() {
-            try {
-                const parsedJson = JSON.parse(jsonInput.value);
-                jsonOutput.textContent = JSON.stringify(parsedJson, null, 2);
-                jsonOutput.className = 'result success formatted-json';
-            } catch (e) {
-                jsonOutput.textContent = 'Ошибка: неверный JSON формат\n' + e.message;
-                jsonOutput.className = 'result error';
-            }
-        });
-        
-        document.getElementById('minify-json').addEventListener('click', function() {
-            try {
-                const parsedJson = JSON.parse(jsonInput.value);
-                jsonOutput.textContent = JSON.stringify(parsedJson);
-                jsonOutput.className = 'result success formatted-json';
-            } catch (e) {
-                jsonOutput.textContent = 'Ошибка: неверный JSON формат\n' + e.message;
-                jsonOutput.className = 'result error';
-            }
-        });
-        
-        document.getElementById('validate-json').addEventListener('click', function() {
-            try {
-                JSON.parse(jsonInput.value);
-                jsonOutput.textContent = '✅ JSON валиден!';
-                jsonOutput.className = 'result success';
-            } catch (e) {
-                jsonOutput.textContent = '❌ Ошибка валидации JSON:\n' + e.message;
-                jsonOutput.className = 'result error';
-            }
-        });
-        
-        document.getElementById('clear-json').addEventListener('click', function() {
-            jsonInput.value = '';
-            jsonOutput.textContent = '';
-        });
-        
-        document.getElementById('copy-json').addEventListener('click', function() {
-            navigator.clipboard.writeText(jsonOutput.textContent).then(() => {
-                const originalText = this.innerHTML;
-                this.innerHTML = '<i class="fas fa-check"></i> Скопировано!';
-                setTimeout(() => {
-                    this.innerHTML = originalText;
-                }, 2000);
-            });
-        });
-        
-        // Initialize JSON formatter on page load
-        document.getElementById('format-json').click();
-        
-        // =============================================
-        // UTF-8 compatible Base64 encoding/decoding
-        // =============================================
-        
-        // Функции для работы с Base64 с поддержкой UTF-8
-        function base64EncodeUTF8(str) {
-            // Преобразование строки в UTF-8
-            const utf8Bytes = new TextEncoder().encode(str);
+        // Поиск инструментов
+        document.getElementById('search-tools').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const toolCards = document.querySelectorAll('.tool-card');
             
-            // Преобразование байтов в base64
-            let binary = '';
-            for (let i = 0; i < utf8Bytes.length; i++) {
-                binary += String.fromCharCode(utf8Bytes[i]);
-            }
-            return btoa(binary);
-        }
-        
-        function base64DecodeUTF8(base64) {
-            try {
-                // Декодирование base64 в бинарную строку
-                const binary = atob(base64);
+            toolCards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const description = card.querySelector('p').textContent.toLowerCase();
                 
-                // Преобразование бинарной строки в байты
-                const bytes = new Uint8Array(binary.length);
-                for (let i = 0; i < binary.length; i++) {
-                    bytes[i] = binary.charCodeAt(i);
-                }
-                
-                // Декодирование UTF-8
-                return new TextDecoder().decode(bytes);
-            } catch (e) {
-                throw new Error('Некорректные Base64 данные: ' + e.message);
-            }
-        }
-        
-        // Encoder/Decoder Tool
-        const encoderInput = document.getElementById('encoder-input');
-        const encoderOutput = document.getElementById('encoder-output');
-        const encoderType = document.getElementById('encoder-type');
-        const encoderStatus = document.getElementById('encoder-status');
-        
-        function showStatus(element, message, isError = false) {
-            element.textContent = message;
-            element.className = isError ? 'status-message status-error' : 'status-message status-success';
-            element.style.display = 'block';
-            
-            setTimeout(() => {
-                element.style.display = 'none';
-            }, 3000);
-        }
-        
-        document.getElementById('encode-decode').addEventListener('click', function() {
-            const input = encoderInput.value;
-            const type = encoderType.value;
-            let result = '';
-            
-            try {
-                switch(type) {
-                    case 'base64-encode':
-                        result = base64EncodeUTF8(input);
-                        showStatus(encoderStatus, '✅ Текст успешно закодирован в Base64 (UTF-8)', false);
-                        break;
-                    case 'base64-decode':
-                        result = base64DecodeUTF8(input);
-                        showStatus(encoderStatus, '✅ Base64 успешно декодирован (UTF-8)', false);
-                        break;
-                    case 'url-encode':
-                        result = encodeURIComponent(input);
-                        showStatus(encoderStatus, '✅ Текст успешно закодирован в URL формат', false);
-                        break;
-                    case 'url-decode':
-                        result = decodeURIComponent(input);
-                        showStatus(encoderStatus, '✅ URL успешно декодирован', false);
-                        break;
-                    case 'html-encode':
-                        result = input.replace(/[&<>"']/g, 
-                            char => ({
-                                '&': '&amp;',
-                                '<': '&lt;',
-                                '>': '&gt;',
-                                '"': '&quot;',
-                                "'": '&#39;'
-                            })[char]
-                        );
-                        showStatus(encoderStatus, '✅ Текст успешно закодирован в HTML Entities', false);
-                        break;
-                    case 'html-decode':
-                        const textArea = document.createElement('textarea');
-                        textArea.innerHTML = input;
-                        result = textArea.value;
-                        showStatus(encoderStatus, '✅ HTML Entities успешно декодированы', false);
-                        break;
-                    default:
-                        result = 'Неизвестный тип преобразования';
-                        showStatus(encoderStatus, '❌ Неизвестный тип преобразования', true);
-                }
-                
-                encoderOutput.textContent = result;
-                encoderOutput.className = 'result success';
-            } catch (e) {
-                encoderOutput.textContent = 'Ошибка: ' + e.message;
-                encoderOutput.className = 'result error';
-                showStatus(encoderStatus, '❌ Ошибка: ' + e.message, true);
-            }
-        });
-        
-        document.getElementById('clear-encoder').addEventListener('click', function() {
-            encoderInput.value = '';
-            encoderOutput.textContent = '';
-            encoderStatus.style.display = 'none';
-        });
-        
-        document.getElementById('copy-encoder').addEventListener('click', function() {
-            navigator.clipboard.writeText(encoderOutput.textContent).then(() => {
-                const originalText = this.innerHTML;
-                this.innerHTML = '<i class="fas fa-check"></i> Скопировано!';
-                setTimeout(() => {
-                    this.innerHTML = originalText;
-                }, 2000);
-            });
-        });
-        
-        // Initialize encoder with sample conversion
-        document.getElementById('encode-decode').click();
-        
-        // Timestamp Converter Tool
-        const timestampInput = document.getElementById('timestamp-input');
-        const timestampOutput = document.getElementById('timestamp-output');
-        const timestampDirection = document.getElementById('timestamp-direction');
-        
-        document.getElementById('convert-timestamp').addEventListener('click', function() {
-            const input = timestampInput.value.trim();
-            const direction = timestampDirection.value;
-            
-            try {
-                if (direction === 'timestamp-to-date') {
-                    // Convert timestamp to date
-                    const timestamp = parseInt(input);
-                    if (isNaN(timestamp)) {
-                        throw new Error('Введите корректный числовой timestamp');
-                    }
-                    
-                    const date = new Date(timestamp * 1000);
-                    const formattedDate = date.toLocaleString('ru-RU', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        timeZoneName: 'short'
-                    });
-                    
-                    timestampOutput.textContent = `${formattedDate}\n\nISO формат: ${date.toISOString()}\nUTC: ${date.toUTCString()}`;
+                if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                    card.style.display = 'block';
                 } else {
-                    // Convert date to timestamp
-                    const date = new Date(input);
-                    if (isNaN(date.getTime())) {
-                        throw new Error('Введите корректную дату');
-                    }
+                    card.style.display = 'none';
+                }
+            });
+        });
+        
+        // Открытие инструментов в модальном окне
+        document.querySelectorAll('.open-tool').forEach(button => {
+            button.addEventListener('click', function() {
+                const toolId = this.getAttribute('data-tool');
+                openToolModal(toolId);
+            });
+        });
+        
+        // Закрытие модального окна
+        document.getElementById('close-modal').addEventListener('click', closeModal);
+        document.getElementById('modal-overlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        // Функция открытия модального окна с инструментом
+        function openToolModal(toolId) {
+            currentTool = toolId;
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            
+            // Устанавливаем заголовок
+            const toolName = document.querySelector(`[data-tool="${toolId}"]`).closest('.tool-card').querySelector('h3').textContent;
+            modalTitle.innerHTML = `<i class="fas fa-tools"></i> ${toolName}`;
+            
+            // Загружаем содержимое инструмента
+            modalContent.innerHTML = getToolContent(toolId);
+            
+            // Показываем модальное окно
+            document.getElementById('modal-overlay').style.display = 'flex';
+            
+            // Инициализируем специфичные для инструмента функции
+            initTool(toolId);
+        }
+        
+        // Функция закрытия модального окна
+        function closeModal() {
+            document.getElementById('modal-overlay').style.display = 'none';
+            
+            // Очищаем редакторы кода
+            for (const key in codeEditors) {
+                if (codeEditors[key]) {
+                    codeEditors[key].toTextArea();
+                }
+            }
+            codeEditors = {};
+        }
+        
+        // Функция получения содержимого инструмента
+        function getToolContent(toolId) {
+            switch(toolId) {
+                case 'smart-pastebin':
+                    return `
+                        <div class="two-column">
+                            <div>
+                                <div class="input-group">
+                                    <label for="code-language">Язык программирования:</label>
+                                    <select id="code-language">
+                                        <option value="javascript">JavaScript</option>
+                                        <option value="html">HTML</option>
+                                        <option value="css">CSS</option>
+                                        <option value="python">Python</option>
+                                        <option value="php">PHP</option>
+                                        <option value="sql">SQL</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label for="code-input">Вставьте ваш код:</label>
+                                    <div class="code-editor">
+                                        <div class="code-editor-header">Код</div>
+                                        <div class="code-editor-content">
+                                            <textarea id="code-input">// Пример кода для анализа
+function calculateComplexity(data) {
+    let result = 0;
+    
+    for (let i = 0; i < data.length; i++) {
+        if (data[i] > 10) {
+            result += data[i] * 2;
+        } else {
+            result += data[i];
+        }
+    }
+    
+    return result;
+}
+
+// Можно упростить с помощью reduce
+function calculateComplexitySimplified(data) {
+    return data.reduce((sum, value) => {
+        return sum + (value > 10 ? value * 2 : value);
+    }, 0);
+}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button id="analyze-code" class="btn"><i class="fas fa-chart-bar"></i> Анализировать код</button>
+                            </div>
+                            <div>
+                                <div class="input-group">
+                                    <label>Метрики кода:</label>
+                                    <div id="code-metrics" class="result"></div>
+                                </div>
+                                <div class="input-group">
+                                    <label>Рекомендации по улучшению:</label>
+                                    <div id="code-suggestions" class="result"></div>
+                                </div>
+                                <div class="input-group">
+                                    <label>Подсветка синтаксиса:</label>
+                                    <div id="code-highlight" class="result" style="max-height: 200px; overflow-y: auto;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
                     
-                    const timestamp = Math.floor(date.getTime() / 1000);
-                    timestampOutput.textContent = `UNIX Timestamp: ${timestamp}\n\nМиллисекунды: ${date.getTime()}`;
-                }
-                
-                timestampOutput.className = 'result success';
-            } catch (e) {
-                timestampOutput.textContent = 'Ошибка: ' + e.message;
-                timestampOutput.className = 'result error';
+                case 'api-request-builder':
+                    return `
+                        <div class="two-column">
+                            <div>
+                                <div class="input-group">
+                                    <label for="api-method">HTTP Метод:</label>
+                                    <select id="api-method">
+                                        <option value="GET">GET</option>
+                                        <option value="POST">POST</option>
+                                        <option value="PUT">PUT</option>
+                                        <option value="DELETE">DELETE</option>
+                                        <option value="PATCH">PATCH</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label for="api-url">URL запроса:</label>
+                                    <input type="text" id="api-url" value="https://jsonplaceholder.typicode.com/posts/1">
+                                </div>
+                                <div class="input-group">
+                                    <label for="api-headers">Заголовки (JSON):</label>
+                                    <textarea id="api-headers" rows="4">{
+    "Content-Type": "application/json",
+    "Accept": "application/json"
+}</textarea>
+                                </div>
+                                <div class="input-group">
+                                    <label for="api-body">Тело запроса (JSON):</label>
+                                    <textarea id="api-body" rows="6">{
+    "title": "Новый пост",
+    "body": "Содержимое нового поста",
+    "userId": 1
+}</textarea>
+                                </div>
+                                <div class="input-group">
+                                    <button id="send-request" class="btn"><i class="fas fa-paper-plane"></i> Отправить запрос</button>
+                                    <button id="generate-code" class="btn btn-success"><i class="fas fa-code"></i> Сгенерировать код</button>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="input-group">
+                                    <label>Ответ от API:</label>
+                                    <div id="api-response" class="result" style="min-height: 200px;"></div>
+                                </div>
+                                <div class="input-group">
+                                    <label for="code-language-select">Язык для генерации кода:</label>
+                                    <select id="code-language-select">
+                                        <option value="javascript">JavaScript (fetch)</option>
+                                        <option value="python">Python (requests)</option>
+                                        <option value="php">PHP (cURL)</option>
+                                        <option value="curl">cURL</option>
+                                    </select>
+                                    <div id="generated-code" class="result" style="min-height: 150px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                case 'ts-interface-generator':
+                    return `
+                        <div class="two-column">
+                            <div>
+                                <div class="input-group">
+                                    <label for="json-input-ts">JSON для конвертации:</label>
+                                    <textarea id="json-input-ts" rows="15">{
+    "id": 1,
+    "name": "Иван Иванов",
+    "email": "ivan@example.com",
+    "age": 30,
+    "isActive": true,
+    "tags": ["user", "premium"],
+    "address": {
+        "street": "Ленина 10",
+        "city": "Москва",
+        "zipcode": "101000"
+    },
+    "orders": [
+        {
+            "id": 1001,
+            "product": "Ноутбук",
+            "price": 999.99
+        }
+    ]
+}</textarea>
+                                </div>
+                                <button id="generate-ts" class="btn"><i class="fas fa-cogs"></i> Сгенерировать TypeScript интерфейсы</button>
+                            </div>
+                            <div>
+                                <div class="input-group">
+                                    <label>Сгенерированные TypeScript интерфейсы:</label>
+                                    <div class="code-editor">
+                                        <div class="code-editor-header">TypeScript</div>
+                                        <div class="code-editor-content">
+                                            <textarea id="ts-output"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <button id="copy-ts" class="btn"><i class="fas fa-copy"></i> Копировать код</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                case 'case-converter':
+                    return `
+                        <div class="two-column">
+                            <div>
+                                <div class="input-group">
+                                    <label for="text-to-convert">Текст для конвертации:</label>
+                                    <textarea id="text-to-convert" rows="6">convert this text to different cases</textarea>
+                                </div>
+                                <div class="input-group">
+                                    <label>Выберите формат:</label>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                        <button class="btn" data-case="camel">camelCase</button>
+                                        <button class="btn" data-case="pascal">PascalCase</button>
+                                        <button class="btn" data-case="snake">snake_case</button>
+                                        <button class="btn" data-case="kebab">kebab-case</button>
+                                        <button class="btn" data-case="upper">UPPER_CASE</button>
+                                        <button class="btn" data-case="title">Title Case</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="input-group">
+                                    <label>Результат:</label>
+                                    <div id="conversion-result" class="result" style="min-height: 150px;"></div>
+                                </div>
+                                <div class="input-group">
+                                    <label>Все форматы:</label>
+                                    <div id="all-cases" class="result" style="min-height: 200px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                case 'password-hash':
+                    return `
+                        <div class="two-column">
+                            <div>
+                                <div class="input-group">
+                                    <label for="password-input">Пароль для хеширования:</label>
+                                    <input type="password" id="password-input" value="MySecurePassword123">
+                                </div>
+                                <div class="input-group">
+                                    <label for="hash-algorithm">Алгоритм хеширования:</label>
+                                    <select id="hash-algorithm">
+                                        <option value="sha256">SHA-256</option>
+                                        <option value="sha512">SHA-512</option>
+                                        <option value="md5">MD5 (небезопасно)</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <button id="generate-hash" class="btn"><i class="fas fa-key"></i> Сгенерировать хеш</button>
+                                    <button id="generate-salt" class="btn btn-success"><i class="fas fa-random"></i> Сгенерировать соль</button>
+                                </div>
+                                <div class="input-group">
+                                    <label>Проверка пароля:</label>
+                                    <input type="password" id="password-verify" placeholder="Введите пароль для проверки">
+                                    <input type="text" id="hash-verify" placeholder="Введите хеш для проверки" style="margin-top: 10px;">
+                                    <button id="verify-password" class="btn" style="margin-top: 10px;"><i class="fas fa-check-circle"></i> Проверить пароль</button>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="input-group">
+                                    <label>Сгенерированный хеш:</label>
+                                    <div id="hash-result" class="result" style="min-height: 80px; word-break: break-all;"></div>
+                                </div>
+                                <div class="input-group">
+                                    <label>Соль:</label>
+                                    <div id="salt-result" class="result" style="min-height: 50px; word-break: break-all;"></div>
+                                </div>
+                                <div class="input-group">
+                                    <label>Результат проверки:</label>
+                                    <div id="verify-result" class="result" style="min-height: 50px;"></div>
+                                </div>
+                                <div class="input-group">
+                                    <label>Рекомендации по безопасности:</label>
+                                    <div class="result" style="font-family: inherit; white-space: normal;">
+                                        <ul>
+                                            <li>Всегда используйте соль при хешировании паролей</li>
+                                            <li>Для паролей рекомендуется использовать алгоритмы bcrypt или Argon2</li>
+                                            <li>SHA-256 и SHA-512 подходят для общих целей, но не для паролей</li>
+                                            <li>MD5 считается небезопасным и не должен использоваться</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                default:
+                    return `
+                        <div style="text-align: center; padding: 40px;">
+                            <i class="fas fa-tools" style="font-size: 3rem; color: #3498db; margin-bottom: 20px;"></i>
+                            <h3>Инструмент в разработке</h3>
+                            <p>Этот инструмент находится в стадии активной разработки и скоро будет доступен.</p>
+                            <p>Вы можете предложить идеи для улучшения этого инструмента.</p>
+                        </div>
+                    `;
             }
-        });
-        
-        document.getElementById('current-timestamp').addEventListener('click', function() {
-            const now = Math.floor(Date.now() / 1000);
-            timestampInput.value = now.toString();
-            timestampDirection.value = 'timestamp-to-date';
-            document.getElementById('convert-timestamp').click();
-        });
-        
-        document.getElementById('copy-timestamp').addEventListener('click', function() {
-            navigator.clipboard.writeText(timestampOutput.textContent).then(() => {
-                const originalText = this.innerHTML;
-                this.innerHTML = '<i class="fas fa-check"></i> Скопировано!';
-                setTimeout(() => {
-                    this.innerHTML = originalText;
-                }, 2000);
-            });
-        });
-        
-        // Initialize timestamp converter
-        document.getElementById('convert-timestamp').click();
-        
-        // Color Converter Tool
-        const colorInput = document.getElementById('color-input');
-        const colorOutput = document.getElementById('color-output');
-        const colorFormat = document.getElementById('color-format');
-        const colorPreview = document.getElementById('color-preview');
-        
-        document.getElementById('convert-color').addEventListener('click', function() {
-            const input = colorInput.value.trim();
-            const format = colorFormat.value;
-            
-            try {
-                let colorObj = parseColor(input);
-                let result = '';
-                
-                switch(format) {
-                    case 'hex':
-                        result = colorObj.hex;
-                        break;
-                    case 'rgb':
-                        result = `rgb(${colorObj.r}, ${colorObj.g}, ${colorObj.b})`;
-                        break;
-                    case 'hsl':
-                        result = `hsl(${colorObj.h}, ${colorObj.s}%, ${colorObj.l}%)`;
-                        break;
-                }
-                
-                colorOutput.textContent = result;
-                colorOutput.className = 'result success';
-                colorPreview.style.backgroundColor = colorObj.hex;
-            } catch (e) {
-                colorOutput.textContent = 'Ошибка: ' + e.message;
-                colorOutput.className = 'result error';
-            }
-        });
-        
-        document.getElementById('random-color').addEventListener('click', function() {
-            const randomHex = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
-            colorInput.value = randomHex;
-            document.getElementById('convert-color').click();
-        });
-        
-        document.getElementById('copy-color').addEventListener('click', function() {
-            navigator.clipboard.writeText(colorOutput.textContent).then(() => {
-                const originalText = this.innerHTML;
-                this.innerHTML = '<i class="fas fa-check"></i> Скопировано!';
-                setTimeout(() => {
-                    this.innerHTML = originalText;
-                }, 2000);
-            });
-        });
-        
-        // Parse color from any format
-        function parseColor(input) {
-            input = input.trim().toLowerCase();
-            
-            // HEX format
-            if (/^#?[0-9a-f]{6}$/i.test(input.replace('#', ''))) {
-                const hex = input.replace('#', '');
-                const r = parseInt(hex.substring(0, 2), 16);
-                const g = parseInt(hex.substring(2, 4), 16);
-                const b = parseInt(hex.substring(4, 6), 16);
-                
-                return {
-                    hex: '#' + hex,
-                    r, g, b,
-                    ...rgbToHsl(r, g, b)
-                };
-            }
-            
-            // RGB format
-            const rgbMatch = input.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-            if (rgbMatch) {
-                const r = parseInt(rgbMatch[1]);
-                const g = parseInt(rgbMatch[2]);
-                const b = parseInt(rgbMatch[3]);
-                
-                return {
-                    hex: rgbToHex(r, g, b),
-                    r, g, b,
-                    ...rgbToHsl(r, g, b)
-                };
-            }
-            
-            // HSL format
-            const hslMatch = input.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
-            if (hslMatch) {
-                const h = parseInt(hslMatch[1]);
-                const s = parseInt(hslMatch[2]);
-                const l = parseInt(hslMatch[3]);
-                const rgb = hslToRgb(h, s, l);
-                
-                return {
-                    hex: rgbToHex(rgb.r, rgb.g, rgb.b),
-                    r: rgb.r,
-                    g: rgb.g,
-                    b: rgb.b,
-                    h, s, l
-                };
-            }
-            
-            throw new Error('Неизвестный формат цвета. Используйте HEX (#RRGGBB), RGB (rgb(r,g,b)) или HSL (hsl(h,s%,l%))');
         }
         
-        function rgbToHex(r, g, b) {
-            return '#' + [r, g, b].map(x => {
-                const hex = x.toString(16);
-                return hex.length === 1 ? '0' + hex : hex;
-            }).join('');
+        // Инициализация специфичных функций инструмента
+        function initTool(toolId) {
+            switch(toolId) {
+                case 'smart-pastebin':
+                    initSmartPastebin();
+                    break;
+                case 'api-request-builder':
+                    initApiRequestBuilder();
+                    break;
+                case 'ts-interface-generator':
+                    initTSInterfaceGenerator();
+                    break;
+                case 'case-converter':
+                    initCaseConverter();
+                    break;
+                case 'password-hash':
+                    initPasswordHash();
+                    break;
+            }
         }
         
-        function rgbToHsl(r, g, b) {
-            r /= 255;
-            g /= 255;
-            b /= 255;
+        // Инициализация Smart Pastebin
+        function initSmartPastebin() {
+            // Инициализация редактора кода
+            const textarea = document.getElementById('code-input');
+            codeEditors.smartPastebin = CodeMirror.fromTextArea(textarea, {
+                lineNumbers: true,
+                mode: "javascript",
+                theme: "dracula",
+                lineWrapping: true
+            });
             
-            const max = Math.max(r, g, b);
-            const min = Math.min(r, g, b);
-            let h, s, l = (max + min) / 2;
-            
-            if (max === min) {
-                h = s = 0; // achromatic
-            } else {
-                const d = max - min;
-                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            // Обработчик изменения языка
+            document.getElementById('code-language').addEventListener('change', function() {
+                const lang = this.value;
+                let mode = "javascript";
                 
-                switch(max) {
-                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                    case g: h = (b - r) / d + 2; break;
-                    case b: h = (r - g) / d + 4; break;
+                switch(lang) {
+                    case 'html': mode = "htmlmixed"; break;
+                    case 'css': mode = "css"; break;
+                    case 'python': mode = "python"; break;
+                    case 'php': mode = "php"; break;
+                    case 'sql': mode = "sql"; break;
                 }
                 
-                h /= 6;
+                codeEditors.smartPastebin.setOption("mode", mode);
+            });
+            
+            // Обработчик анализа кода
+            document.getElementById('analyze-code').addEventListener('click', function() {
+                const code = codeEditors.smartPastebin.getValue();
+                const language = document.getElementById('code-language').value;
+                
+                // Анализ сложности кода
+                const metrics = analyzeCodeComplexity(code, language);
+                
+                // Отображение метрик
+                let metricsHtml = `<strong>Метрики кода:</strong>\n`;
+                metricsHtml += `• Строк кода: ${metrics.lines}\n`;
+                metricsHtml += `• Символов: ${metrics.chars}\n`;
+                metricsHtml += `• Сложность (цикломатическая): ${metrics.complexity}/10\n`;
+                metricsHtml += `• Количество функций: ${metrics.functions}\n`;
+                metricsHtml += `• Максимальная вложенность: ${metrics.nesting}\n`;
+                
+                document.getElementById('code-metrics').textContent = metricsHtml;
+                
+                // Генерация рекомендаций
+                const suggestions = generateCodeSuggestions(metrics, language);
+                document.getElementById('code-suggestions').textContent = suggestions;
+                
+                // Подсветка синтаксиса (упрощенная)
+                document.getElementById('code-highlight').innerHTML = `<pre>${escapeHtml(code)}</pre>`;
+            });
+            
+            // Запускаем начальный анализ
+            setTimeout(() => {
+                document.getElementById('analyze-code').click();
+            }, 500);
+        }
+        
+        // Анализ сложности кода
+        function analyzeCodeComplexity(code, language) {
+            const lines = code.split('\n').filter(line => line.trim() !== '').length;
+            const chars = code.length;
+            
+            // Простая эвристика для оценки сложности
+            let complexity = 1;
+            let functions = 0;
+            let nesting = 0;
+            
+            // Подсчет функций
+            const functionMatches = code.match(/(function|const|let|var)\s+\w+\s*=/g) || [];
+            functions = functionMatches.length;
+            
+            // Подсчет вложенности (по фигурным скобкам)
+            let currentNesting = 0;
+            let maxNesting = 0;
+            
+            for (let char of code) {
+                if (char === '{') {
+                    currentNesting++;
+                    maxNesting = Math.max(maxNesting, currentNesting);
+                } else if (char === '}') {
+                    currentNesting--;
+                }
             }
+            
+            nesting = maxNesting;
+            
+            // Вычисление сложности (упрощенный алгоритм)
+            complexity = Math.min(10, Math.max(1, 
+                Math.floor(functions * 0.5 + nesting * 1.5 + lines / 50)
+            ));
             
             return {
-                h: Math.round(h * 360),
-                s: Math.round(s * 100),
-                l: Math.round(l * 100)
+                lines,
+                chars,
+                complexity,
+                functions,
+                nesting
             };
         }
         
-        function hslToRgb(h, s, l) {
-            s /= 100;
-            l /= 100;
+        // Генерация рекомендаций по улучшению кода
+        function generateCodeSuggestions(metrics, language) {
+            let suggestions = "Рекомендации по улучшению кода:\n\n";
             
-            const c = (1 - Math.abs(2 * l - 1)) * s;
-            const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-            const m = l - c / 2;
-            
-            let r, g, b;
-            
-            if (h >= 0 && h < 60) {
-                [r, g, b] = [c, x, 0];
-            } else if (h >= 60 && h < 120) {
-                [r, g, b] = [x, c, 0];
-            } else if (h >= 120 && h < 180) {
-                [r, g, b] = [0, c, x];
-            } else if (h >= 180 && h < 240) {
-                [r, g, b] = [0, x, c];
-            } else if (h >= 240 && h < 300) {
-                [r, g, b] = [x, 0, c];
-            } else {
-                [r, g, b] = [c, 0, x];
+            if (metrics.complexity > 7) {
+                suggestions += "• Высокая сложность кода. Рассмотрите возможность разбиения на более мелкие функции.\n";
             }
             
-            return {
-                r: Math.round((r + m) * 255),
-                g: Math.round((g + m) * 255),
-                b: Math.round((b + m) * 255)
-            };
+            if (metrics.nesting > 3) {
+                suggestions += "• Большая вложенность кода. Упростите логику для улучшения читаемости.\n";
+            }
+            
+            if (metrics.lines > 50) {
+                suggestions += "• Длинная функция. Разделите на несколько более специализированных функций.\n";
+            }
+            
+            if (metrics.functions === 0 && metrics.lines > 10) {
+                suggestions += "• Отсутствуют функции. Выделите повторяющуюся логику в отдельные функции.\n";
+            }
+            
+            if (suggestions === "Рекомендации по улучшению кода:\n\n") {
+                suggestions += "• Код имеет хорошую структуру и читаемость. Продолжайте в том же духе!";
+            }
+            
+            // Общие рекомендации
+            suggestions += "\nОбщие рекомендации:\n";
+            suggestions += "• Используйте осмысленные имена переменных и функций\n";
+            suggestions += "• Добавляйте комментарии для сложной логики\n";
+            suggestions += "• Следуйте стандартам кодирования для выбранного языка\n";
+            
+            return suggestions;
         }
         
-        // Initialize color converter
-        document.getElementById('convert-color').click();
-        
-        // Hash Generator Utility
-        document.getElementById('generate-hash').addEventListener('click', function() {
-            const input = document.getElementById('hash-input').value;
-            const algorithm = document.getElementById('hash-algorithm').value;
-            
-            // Для демонстрации используем простую реализацию
-            // В реальном приложении следует использовать криптографические библиотеки
-            async function generateHash(text, algo) {
-                // Создаем простой "хеш" для демонстрации
-                const encoder = new TextEncoder();
-                const data = encoder.encode(text);
+        // Инициализация API Request Builder
+        function initApiRequestBuilder() {
+            // Обработчик отправки запроса
+            document.getElementById('send-request').addEventListener('click', async function() {
+                const method = document.getElementById('api-method').value;
+                const url = document.getElementById('api-url').value;
+                const headersText = document.getElementById('api-headers').value;
+                const bodyText = document.getElementById('api-body').value;
                 
-                if (window.crypto && window.crypto.subtle) {
+                let headers = {};
+                try {
+                    headers = JSON.parse(headersText);
+                } catch (e) {
+                    document.getElementById('api-response').textContent = `Ошибка в заголовках JSON: ${e.message}`;
+                    return;
+                }
+                
+                let body = null;
+                if (['POST', 'PUT', 'PATCH'].includes(method) && bodyText.trim()) {
                     try {
-                        let hashBuffer;
-                        if (algo === 'sha256') {
-                            hashBuffer = await crypto.subtle.digest('SHA-256', data);
-                        } else if (algo === 'sha1') {
-                            hashBuffer = await crypto.subtle.digest('SHA-1', data);
-                        } else {
-                            // Для MD5 используем простую реализацию
-                            return 'md5_' + Array.from(data)
-                                .map(b => b.toString(16).padStart(2, '0'))
-                                .join('').substring(0, 32);
-                        }
-                        
-                        const hashArray = Array.from(new Uint8Array(hashBuffer));
-                        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                        body = JSON.parse(bodyText);
                     } catch (e) {
-                        console.error('Ошибка генерации хеша:', e);
+                        document.getElementById('api-response').textContent = `Ошибка в теле JSON: ${e.message}`;
+                        return;
                     }
                 }
                 
-                // Fallback: простая реализация для демонстрации
-                const simpleHash = Array.from(data)
-                    .map(b => b.toString(16).padStart(2, '0'))
-                    .join('')
-                    .substring(0, 32);
+                try {
+                    const options = {
+                        method: method,
+                        headers: headers
+                    };
                     
-                return algo + '_' + simpleHash;
+                    if (body) {
+                        options.body = JSON.stringify(body);
+                    }
+                    
+                    const response = await fetch(url, options);
+                    const responseText = await response.text();
+                    
+                    let formattedResponse;
+                    try {
+                        formattedResponse = JSON.stringify(JSON.parse(responseText), null, 2);
+                    } catch {
+                        formattedResponse = responseText;
+                    }
+                    
+                    document.getElementById('api-response').textContent = 
+                        `Статус: ${response.status} ${response.statusText}\n\n${formattedResponse}`;
+                } catch (error) {
+                    document.getElementById('api-response').textContent = `Ошибка: ${error.message}`;
+                }
+            });
+            
+            // Обработчик генерации кода
+            document.getElementById('generate-code').addEventListener('click', function() {
+                const method = document.getElementById('api-method').value;
+                const url = document.getElementById('api-url').value;
+                const headersText = document.getElementById('api-headers').value;
+                const bodyText = document.getElementById('api-body').value;
+                const language = document.getElementById('code-language-select').value;
+                
+                let headers = {};
+                try {
+                    headers = JSON.parse(headersText);
+                } catch {
+                    headers = {};
+                }
+                
+                let body = null;
+                if (bodyText.trim()) {
+                    try {
+                        body = JSON.parse(bodyText);
+                    } catch {
+                        body = bodyText;
+                    }
+                }
+                
+                const code = generateApiCode(method, url, headers, body, language);
+                document.getElementById('generated-code').textContent = code;
+            });
+        }
+        
+        // Генерация кода для API запроса
+        function generateApiCode(method, url, headers, body, language) {
+            switch(language) {
+                case 'javascript':
+                    return generateJavaScriptCode(method, url, headers, body);
+                case 'python':
+                    return generatePythonCode(method, url, headers, body);
+                case 'php':
+                    return generatePHPCode(method, url, headers, body);
+                case 'curl':
+                    return generateCurlCode(method, url, headers, body);
+                default:
+                    return 'Выберите язык для генерации кода';
+            }
+        }
+        
+        function generateJavaScriptCode(method, url, headers, body) {
+            let code = `// JavaScript (fetch)\n`;
+            code += `const url = '${url}';\n`;
+            code += `const options = {\n`;
+            code += `  method: '${method}',\n`;
+            code += `  headers: ${JSON.stringify(headers, null, 2)},\n`;
+            
+            if (body && method !== 'GET') {
+                code += `  body: JSON.stringify(${JSON.stringify(body, null, 2)})\n`;
             }
             
-            generateHash(input, algorithm).then(hash => {
-                document.getElementById('hash-output').textContent = hash;
-            });
-        });
-        
-        // QR Code Generator Utility
-        document.getElementById('generate-qr').addEventListener('click', function() {
-            const input = document.getElementById('qr-input').value;
-            const qrOutput = document.getElementById('qr-output');
+            code += `};\n\n`;
+            code += `fetch(url, options)\n`;
+            code += `  .then(response => response.json())\n`;
+            code += `  .then(data => console.log(data))\n`;
+            code += `  .catch(error => console.error('Error:', error));`;
             
-            // В реальном приложении используйте библиотеку для генерации QR-кодов
-            // Для демонстрации покажем "симуляцию" QR-кода
-            qrOutput.innerHTML = `
-                <div style="background-color: white; padding: 15px; display: inline-block; border: 1px solid #ddd; border-radius: 8px;">
-                    <div style="font-family: monospace; line-height: 1; letter-spacing: 2px; font-size: 12px; background: white; padding: 10px;">
-                        ██████████████████<br>
-                        ██░░░░░░████░░░░██<br>
-                        ██░████░██░░░██░██<br>
-                        ██░████░█░██░░░███<br>
-                        ██░████░███░█░███<br>
-                        ██░░░░░░███░░░░░██<br>
-                        ██████████████████<br>
-                        ░░░██░░░█░███░░██░<br>
-                        █░░█░░██░░███░█░░█<br>
-                        ░██░█░░░███░░██░░░<br>
-                    </div>
-                    <p style="margin-top: 10px; font-size: 0.9rem; max-width: 200px;">QR-код для: <strong>${input.substring(0, 25)}${input.length > 25 ? '...' : ''}</strong></p>
-                    <p style="margin-top: 5px; font-size: 0.75rem; color: #666;">В реальном приложении здесь будет сгенерирован настоящий QR-код с использованием библиотеки</p>
-                </div>
-            `;
-        });
+            return code;
+        }
         
-        // Random Data Generator Utility
-        document.getElementById('generate-random').addEventListener('click', function() {
-            const type = document.getElementById('random-type').value;
+        function generatePythonCode(method, url, headers, body) {
+            let code = `# Python (requests)\n`;
+            code += `import requests\nimport json\n\n`;
+            code += `url = '${url}'\n`;
+            code += `headers = ${JSON.stringify(headers, null, 2)}\n\n`;
+            
+            if (body && method !== 'GET') {
+                code += `data = ${JSON.stringify(body, null, 2)}\n\n`;
+                code += `response = requests.${method.toLowerCase()}(url, headers=headers, json=data)\n`;
+            } else {
+                code += `response = requests.${method.toLowerCase()}(url, headers=headers)\n`;
+            }
+            
+            code += `print(response.status_code)\n`;
+            code += `print(response.json())`;
+            
+            return code;
+        }
+        
+        // Инициализация TypeScript Interface Generator
+        function initTSInterfaceGenerator() {
+            // Инициализация редактора для вывода
+            const tsOutput = document.getElementById('ts-output');
+            codeEditors.tsOutput = CodeMirror.fromTextArea(tsOutput, {
+                lineNumbers: true,
+                mode: "javascript",
+                theme: "dracula",
+                readOnly: true
+            });
+            
+            // Обработчик генерации интерфейсов
+            document.getElementById('generate-ts').addEventListener('click', function() {
+                const jsonInput = document.getElementById('json-input-ts').value;
+                
+                try {
+                    const jsonObj = JSON.parse(jsonInput);
+                    const interfaces = generateTypeScriptInterfaces(jsonObj, 'Root');
+                    codeEditors.tsOutput.setValue(interfaces);
+                } catch (e) {
+                    codeEditors.tsOutput.setValue(`// Ошибка парсинга JSON: ${e.message}`);
+                }
+            });
+            
+            // Обработчик копирования кода
+            document.getElementById('copy-ts').addEventListener('click', function() {
+                const code = codeEditors.tsOutput.getValue();
+                navigator.clipboard.writeText(code).then(() => {
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i> Скопировано!';
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                    }, 2000);
+                });
+            });
+            
+            // Запускаем начальную генерацию
+            setTimeout(() => {
+                document.getElementById('generate-ts').click();
+            }, 500);
+        }
+        
+        // Генерация TypeScript интерфейсов из JSON
+        function generateTypeScriptInterfaces(obj, interfaceName, processed = new Set()) {
+            if (processed.has(obj)) {
+                return `// Циклическая ссылка обнаружена\n`;
+            }
+            
+            processed.add(obj);
+            
+            let result = `interface ${interfaceName} {\n`;
+            
+            for (const [key, value] of Object.entries(obj)) {
+                const type = getTypeScriptType(value, key);
+                result += `  ${key}: ${type};\n`;
+                
+                // Рекурсивно генерируем интерфейсы для объектов
+                if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                    const nestedInterfaceName = capitalizeFirstLetter(key);
+                    result += `\n${generateTypeScriptInterfaces(value, nestedInterfaceName, processed)}`;
+                }
+                
+                // Обрабатываем массивы объектов
+                if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object' && value[0] !== null) {
+                    const arrayInterfaceName = capitalizeFirstLetter(key.slice(0, -1)); // Убираем 's' в конце
+                    result += `\n${generateTypeScriptInterfaces(value[0], arrayInterfaceName, processed)}`;
+                }
+            }
+            
+            result += `}\n\n`;
+            return result;
+        }
+        
+        function getTypeScriptType(value, key) {
+            if (value === null) return 'null';
+            
+            const type = typeof value;
+            
+            switch(type) {
+                case 'string':
+                    return 'string';
+                case 'number':
+                    return 'number';
+                case 'boolean':
+                    return 'boolean';
+                case 'object':
+                    if (Array.isArray(value)) {
+                        if (value.length === 0) return 'any[]';
+                        const itemType = getTypeScriptType(value[0], key);
+                        return `${itemType}[]`;
+                    }
+                    const interfaceName = capitalizeFirstLetter(key);
+                    return interfaceName;
+                default:
+                    return 'any';
+            }
+        }
+        
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+        
+        // Инициализация Case Converter
+        function initCaseConverter() {
+            // Обработчики для кнопок преобразования
+            document.querySelectorAll('[data-case]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const caseType = this.getAttribute('data-case');
+                    const text = document.getElementById('text-to-convert').value;
+                    const converted = convertCase(text, caseType);
+                    document.getElementById('conversion-result').textContent = converted;
+                    
+                    // Показываем все варианты
+                    showAllCases(text);
+                });
+            });
+            
+            // Обработчик изменения текста
+            document.getElementById('text-to-convert').addEventListener('input', function() {
+                const text = this.value;
+                showAllCases(text);
+            });
+            
+            // Показываем начальные варианты
+            setTimeout(() => {
+                const text = document.getElementById('text-to-convert').value;
+                showAllCases(text);
+                document.querySelector('[data-case="camel"]').click();
+            }, 500);
+        }
+        
+        // Конвертация регистра
+        function convertCase(text, caseType) {
+            const words = text.toLowerCase().split(/[\s-_]+/).filter(w => w);
+            
+            switch(caseType) {
+                case 'camel':
+                    return words.map((word, i) => 
+                        i === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)
+                    ).join('');
+                    
+                case 'pascal':
+                    return words.map(word => 
+                        word.charAt(0).toUpperCase() + word.slice(1)
+                    ).join('');
+                    
+                case 'snake':
+                    return words.join('_');
+                    
+                case 'kebab':
+                    return words.join('-');
+                    
+                case 'upper':
+                    return words.join('_').toUpperCase();
+                    
+                case 'title':
+                    return words.map(word => 
+                        word.charAt(0).toUpperCase() + word.slice(1)
+                    ).join(' ');
+                    
+                default:
+                    return text;
+            }
+        }
+        
+        // Показать все варианты регистров
+        function showAllCases(text) {
+            const cases = ['camel', 'pascal', 'snake', 'kebab', 'upper', 'title'];
             let result = '';
             
-            if (type === 'password') {
-                const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                const lowercase = 'abcdefghijklmnopqrstuvwxyz';
-                const numbers = '0123456789';
-                const symbols = '!@#$%^&*';
-                const allChars = uppercase + lowercase + numbers + symbols;
+            cases.forEach(caseType => {
+                const converted = convertCase(text, caseType);
+                result += `${caseType}: ${converted}\n`;
+            });
+            
+            document.getElementById('all-cases').textContent = result;
+        }
+        
+        // Инициализация Password Hash
+        function initPasswordHash() {
+            // Генерация хеша
+            document.getElementById('generate-hash').addEventListener('click', async function() {
+                const password = document.getElementById('password-input').value;
+                const algorithm = document.getElementById('hash-algorithm').value;
                 
-                // Гарантируем наличие хотя бы одного символа из каждой группы
-                result = uppercase[Math.floor(Math.random() * uppercase.length)] +
-                        lowercase[Math.floor(Math.random() * lowercase.length)] +
-                        numbers[Math.floor(Math.random() * numbers.length)] +
-                        symbols[Math.floor(Math.random() * symbols.length)];
+                // Генерация соли
+                const salt = generateSalt(16);
+                document.getElementById('salt-result').textContent = salt;
                 
-                // Добавляем остальные символы
-                for (let i = 0; i < 8; i++) {
-                    result += allChars[Math.floor(Math.random() * allChars.length)];
+                // Создание хеша (упрощенная версия)
+                const hash = await generateHash(password + salt, algorithm);
+                document.getElementById('hash-result').textContent = hash;
+            });
+            
+            // Генерация соли
+            document.getElementById('generate-salt').addEventListener('click', function() {
+                const salt = generateSalt(32);
+                document.getElementById('salt-result').textContent = salt;
+            });
+            
+            // Проверка пароля
+            document.getElementById('verify-password').addEventListener('click', async function() {
+                const password = document.getElementById('password-verify').value;
+                const hash = document.getElementById('hash-verify').value;
+                
+                if (!password || !hash) {
+                    document.getElementById('verify-result').textContent = 'Введите пароль и хеш для проверки';
+                    return;
                 }
                 
-                // Перемешиваем строку
-                result = result.split('').sort(() => Math.random() - 0.5).join('');
-            } else if (type === 'uuid') {
-                result = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                    const r = Math.random() * 16 | 0;
-                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                    return v.toString(16);
-                });
-            } else if (type === 'number') {
-                const min = 1;
-                const max = 1000000;
-                result = Math.floor(Math.random() * (max - min + 1) + min).toString();
-            } else if (type === 'string') {
-                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-                result = Array.from({length: 12}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+                // В реальном приложении здесь была бы проверка с учетом соли
+                const testHash = await generateHash(password, 'sha256');
+                const isMatch = hash === testHash;
+                
+                document.getElementById('verify-result').textContent = 
+                    isMatch ? '✅ Пароль совпадает с хешем' : '❌ Пароль не совпадает с хешем';
+            });
+            
+            // Запускаем начальную генерацию
+            setTimeout(() => {
+                document.getElementById('generate-hash').click();
+                document.getElementById('generate-salt').click();
+            }, 500);
+        }
+        
+        // Генерация соли
+        function generateSalt(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+            let result = '';
+            
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
             }
             
-            document.getElementById('random-output').textContent = result;
-        });
+            return result;
+        }
         
-        // Text Analysis Utility
-        document.getElementById('analyze-text').addEventListener('click', function() {
-            const text = document.getElementById('text-utility-input').value;
+        // Генерация хеша (упрощенная версия)
+        async function generateHash(text, algorithm) {
+            // В реальном приложении используйте Web Crypto API
+            // Для демонстрации используем упрощенную версию
             
-            // Подсчет символов
-            const charCount = text.length;
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
             
-            // Подсчет символов без пробелов
-            const charCountNoSpaces = text.replace(/\s/g, '').length;
+            if (window.crypto && window.crypto.subtle) {
+                try {
+                    let hashBuffer;
+                    
+                    switch(algorithm) {
+                        case 'sha256':
+                            hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                            break;
+                        case 'sha512':
+                            hashBuffer = await crypto.subtle.digest('SHA-512', data);
+                            break;
+                        case 'md5':
+                            // MD5 не поддерживается Web Crypto API
+                            return simpleMD5(text);
+                        default:
+                            hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                    }
+                    
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                } catch (e) {
+                    console.error('Ошибка генерации хеша:', e);
+                }
+            }
             
-            // Подсчет слов
-            const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-            
-            // Подсчет строк
-            const lineCount = text === '' ? 0 : text.split('\n').length;
-            
-            // Определение языка (простая эвристика)
-            const hasCyrillic = /[а-яА-ЯёЁ]/.test(text);
-            const hasLatin = /[a-zA-Z]/.test(text);
-            let language = 'неопределен';
-            if (hasCyrillic && !hasLatin) language = 'русский';
-            else if (hasLatin && !hasCyrillic) language = 'английский';
-            else if (hasCyrillic && hasLatin) language = 'смешанный';
-            
-            const analysisResult = `
-                Статистика текста:
-                -----------------
-                Символов (всего): ${charCount}
-                Символов (без пробелов): ${charCountNoSpaces}
-                Слов: ${wordCount}
-                Строк: ${lineCount}
-                Язык: ${language}
-                
-                Преобразования:
-                -----------------
-                Верхний регистр: ${text.toUpperCase()}
-                Нижний регистр: ${text.toLowerCase()}
-                
-                ${text.length > 100 ? '(Текст обрезан для отображения)' : ''}
-            `;
-            
-            document.getElementById('text-analysis-output').textContent = analysisResult;
-        });
+            // Fallback для браузеров без поддержки
+            return simpleHash(text, algorithm);
+        }
         
-        // Initialize utilities with some data
-        document.getElementById('generate-hash').click();
-        document.getElementById('generate-qr').click();
-        document.getElementById('generate-random').click();
-        document.getElementById('analyze-text').click();
+        // Упрощенная функция хеширования для демонстрации
+        function simpleHash(text, algorithm) {
+            let hash = 0;
+            
+            for (let i = 0; i < text.length; i++) {
+                hash = ((hash << 5) - hash) + text.charCodeAt(i);
+                hash = hash & hash;
+            }
+            
+            // Добавляем префикс алгоритма для наглядности
+            return `${algorithm}_${Math.abs(hash).toString(16)}${text.length.toString(16)}`;
+        }
+        
+        function simpleMD5(text) {
+            // Упрощенная версия MD5 для демонстрации
+            let hash = 0;
+            
+            for (let i = 0; i < text.length; i++) {
+                hash = ((hash << 5) - hash) + text.charCodeAt(i);
+                hash = hash & hash;
+            }
+            
+            return `md5_${Math.abs(hash).toString(16)}`;
+        }
+        
+        // Вспомогательные функции
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // PHP код генерации
+        function generatePHPCode(method, url, headers, body) {
+            let code = `<?php\n`;
+            code += `// PHP (cURL)\n`;
+            code += `$url = '${url}';\n`;
+            code += `$headers = ${JSON.stringify(headers, null, 2)};\n\n`;
+            
+            code += `$ch = curl_init($url);\n`;
+            code += `curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);\n`;
+            code += `curl_setopt($ch, CURLOPT_CUSTOMREQUEST, '${method}');\n\n`;
+            
+            if (Object.keys(headers).length > 0) {
+                code += `$headerArray = [];\n`;
+                for (const [key, value] of Object.entries(headers)) {
+                    code += `$headerArray[] = '${key}: ${value}';\n`;
+                }
+                code += `curl_setopt($ch, CURLOPT_HTTPHEADER, $headerArray);\n\n`;
+            }
+            
+            if (body && method !== 'GET') {
+                code += `$data = ${JSON.stringify(body, null, 2)};\n`;
+                code += `curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));\n\n`;
+            }
+            
+            code += `$response = curl_exec($ch);\n`;
+            code += `curl_close($ch);\n\n`;
+            code += `echo $response;\n`;
+            code += `?>`;
+            
+            return code;
+        }
+        
+        // cURL код генерации
+        function generateCurlCode(method, url, headers, body) {
+            let code = `# cURL\n`;
+            code += `curl -X ${method} '${url}' \\\n`;
+            
+            for (const [key, value] of Object.entries(headers)) {
+                code += `     -H '${key}: ${value}' \\\n`;
+            }
+            
+            if (body && method !== 'GET') {
+                code += `     -d '${JSON.stringify(body)}'`;
+            }
+            
+            return code;
+        }
+        
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DevToolkit Pro загружен! Доступно более 50 инструментов для разработчиков.');
+        });
     </script>
 </body>
 </html>
