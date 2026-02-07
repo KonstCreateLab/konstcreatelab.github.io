@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Эмулятор терминала Linux</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body {
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .terminal-header {
+            background: linear-gradient(to bottom, #e4e4e4, #c0c0c0);
+            color: #333;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #999;
+        }
+        
+        .terminal-title {
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .window-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .close { background-color: #ff5f57; }
+        .minimize { background-color: #ffbd2e; }
+        .maximize { background-color: #28ca42; }
+        
+        .terminal-body {
+            background-color: #2b2b2b;
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .terminal-output {
+            flex-grow: 1;
+            margin-bottom: 10px;
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+        
+        .terminal-output div {
+            margin-bottom: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .command-line {
+            display: flex;
+            align-items: center;
+        }
+        
+        .prompt {
+            color: #28ca42;
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+        
+        .prompt-user {
+            color: #6a9fb5;
+            font-weight: bold;
+        }
+        
+        .prompt-symbol {
+            color: #f0f0f0;
+        }
+        
+        #command-input {
+            background: transparent;
+            border: none;
+            color: #f0f0f0;
+            font-size: 16px;
+            flex-grow: 1;
+            outline: none;
+            caret-color: #f0f0f0;
+        }
+        
+        .command-output {
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .command-output.error {
+            color: #ff6b6b;
+        }
+        
+        .command-output.success {
+            color: #28ca42;
+        }
+        
+        .command-output.info {
+            color: #6a9fb5;
+        }
+        
+        .directory {
+            color: #6a9fb5;
+            font-weight: bold;
+        }
+        
+        .file {
+            color: #f0f0f0;
+        }
+        
+        .executable {
+            color: #28ca42;
+        }
+        
+        .help-command {
+            margin-bottom: 8px;
+            display: flex;
+        }
+        
+        .help-command-name {
+            color: #6a9fb5;
+            width: 120px;
+        }
+        
+        .help-command-desc {
+            color: #f0f0f0;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+            font-size: 14px;
+        }
+        
+        .cursor {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        /* Полоса прокрутки */
+        .terminal-output::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        .terminal-output::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        
+        .terminal-output::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 5px;
+        }
+        
+        .terminal-output::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-header">
+            <div class="terminal-title">
+                <i class="fas fa-terminal"></i>
+                <span>user@linux-terminal: ~</span>
+            </div>
+            <div class="window-controls">
+                <div class="control-btn close" id="close-btn"></div>
+                <div class="control-btn minimize" id="minimize-btn"></div>
+                <div class="control-btn maximize" id="maximize-btn"></div>
+            </div>
+        </div>
+        
+        <div class="terminal-body">
+            <div class="terminal-output" id="output">
+                <div class="welcome-message">
+                    Добро пожаловать в эмулятор терминала Linux!<br>
+                    Для просмотра доступных команд введите <span class="executable">help</span>.<br>
+                    Для очистки экрана введите <span class="executable">clear</span>.<br><br>
+                </div>
+                <div class="command-line">
+                    <div class="prompt">
+                        <span class="prompt-user">user@linux</span>
+                        <span class="prompt-symbol">:~$</span>
+                    </div>
+                    <span class="command">help</span>
+                </div>
+                <div class="command-output info">
+                    Доступные команды:<br>
+                    <div class="help-command">
+                        <div class="help-command-name">help</div>
+                        <div class="help-command-desc">показать список доступных команд</div>
+                    </div>
+                    <div class="help-command">
+                        <div class="help-command-name">clear</div>
+                        <div class="help-command-desc">очистить экран терминала</div>
+                    </div>
+                    <div class="help-command">
+                        <div class="help-command-name">ls</div>
+                        <div class="help-command-desc">показать содержимое текущей директории</div>
+                    </div>
+                    <div class="help-command">
+                        <div class="help-command-name">pwd</div>
+                        <div class="help-command-desc">показать текущую директорию</div>
+                    </div>
+                    <div class="help-command">
+                        <div class="help-command-name">cd [dir]</div>
+                        <div class="help-command-desc">перейти в указанную директорию</div>
+                    </div>
+                    <div class="help-command">
+                        <div class="help-command-name">cat [file]</div>
+                        <div class="help-command-desc">показать содержимое файла</div>
+                    </div>
+                    <div class="help-command">
+                        <div class="help-command-name">echo [text]</div>
+                        <div class="help-command-desc">вывести текст</div>
+                    </div>
+                    <div class="help-command">
+                        <div class="help-command-name">date</div>
+                        <div class="help-command-desc">показать текущую дату и время</div>
+                    </div>
+                    <div class="help-command">
+                        <div class="help-command-name">whoami</div>
+                        <div class="help-command-desc">показать текущего пользователя</div>
+                    </div>
+                    <div class="help-command">
+                        <div class="help-command-name">neofetch</div>
+                        <div class="help-command-desc">показать информацию о системе</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="command-line">
+                <div class="prompt">
+                    <span class="prompt-user">user@linux</span>
+                    <span class="prompt-symbol">:~$</span>
+                </div>
+                <input type="text" id="command-input" autocomplete="off" autofocus>
+                <span class="cursor">▌</span>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        Эмулятор терминала Linux | Используйте стрелки вверх/вниз для навигации по истории команд
+    </footer>
+
+    <script>
+        // Инициализация переменных
+        const output = document.getElementById('output');
+        const commandInput = document.getElementById('command-input');
+        const closeBtn = document.getElementById('close-btn');
+        const minimizeBtn = document.getElementById('minimize-btn');
+        const maximizeBtn = document.getElementById('maximize-btn');
+        
+        let commandHistory = [];
+        let historyIndex = -1;
+        let currentDirectory = '~';
+        
+        // Файловая система эмулятора
+        const fileSystem = {
+            '~': {
+                type: 'directory',
+                contents: {
+                    'документы': {type: 'directory'},
+                    'загрузки': {type: 'directory'},
+                    'рабочий стол': {type: 'directory'},
+                    'README.txt': {type: 'file', content: 'Добро пожаловать в эмулятор терминала Linux!\nЭтот файл находится в вашей домашней директории.\n\nВы можете использовать различные команды для навигации и работы с файлами.'},
+                    'script.sh': {type: 'executable', content: '#!/bin/bash\necho "Привет из скрипта!"'}
+                }
+            },
+            '~/документы': {
+                type: 'directory',
+                contents: {
+                    'проект': {type: 'directory'},
+                    'отчет.txt': {type: 'file', content: 'Еженедельный отчет\n-----------------\nЗавершена работа над эмулятором терминала.'}
+                }
+            },
+            '~/загрузки': {
+                type: 'directory',
+                contents: {
+                    'архив.zip': {type: 'file'},
+                    'изображение.png': {type: 'file'}
+                }
+            },
+            '~/рабочий стол': {
+                type: 'directory',
+                contents: {
+                    'ярлык.txt': {type: 'file', content: 'Это ярлык на рабочем столе.'}
+                }
+            },
+            '~/документы/проект': {
+                type: 'directory',
+                contents: {
+                    'main.py': {type: 'file', content: 'print("Hello, World!")'},
+                    'config.json': {type: 'file', content: '{\n  "name": "Эмулятор терминала",\n  "version": "1.0"\n}'}
+                }
+            }
+        };
+        
+        // Обработчики для кнопок окна
+        closeBtn.addEventListener('click', () => {
+            document.body.innerHTML = '<div style="color: #fff; text-align: center; padding: 50px; font-family: monospace;">Терминал закрыт. Обновите страницу для повторного запуска.</div>';
+        });
+        
+        minimizeBtn.addEventListener('click', () => {
+            alert('В реальном терминале это свернуло бы окно. В данном эмуляторе эта функция не реализована.');
+        });
+        
+        maximizeBtn.addEventListener('click', () => {
+            const container = document.querySelector('.container');
+            if (container.style.width === '100vw') {
+                container.style.width = '';
+                container.style.height = '';
+                container.style.maxWidth = '900px';
+                container.style.maxHeight = '600px';
+            } else {
+                container.style.width = '100vw';
+                container.style.height = '100vh';
+                container.style.maxWidth = 'none';
+                container.style.maxHeight = 'none';
+                container.style.borderRadius = '0';
+            }
+        });
+        
+        // Обработка ввода команд
+        commandInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                processCommand(commandInput.value);
+                commandInput.value = '';
+                historyIndex = -1;
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (commandHistory.length > 0) {
+                    if (historyIndex < commandHistory.length - 1) {
+                        historyIndex++;
+                    }
+                    commandInput.value = commandHistory[commandHistory.length - 1 - historyIndex] || '';
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    commandInput.value = commandHistory[commandHistory.length - 1 - historyIndex] || '';
+                } else {
+                    historyIndex = -1;
+                    commandInput.value = '';
+                }
+            }
+        });
+        
+        // Функция обработки команд
+        function processCommand(cmd) {
+            if (!cmd.trim()) return;
+            
+            // Добавление команды в историю
+            commandHistory.push(cmd);
+            
+            // Отображение введенной команды
+            const commandLine = document.createElement('div');
+            commandLine.className = 'command-line';
+            commandLine.innerHTML = `
+                <div class="prompt">
+                    <span class="prompt-user">user@linux</span>
+                    <span class="prompt-symbol">:${currentDirectory}$</span>
+                </div>
+                <span class="command">${cmd}</span>
+            `;
+            output.appendChild(commandLine);
+            
+            // Обработка команды
+            const args = cmd.trim().split(/\s+/);
+            const command = args[0].toLowerCase();
+            const commandOutput = document.createElement('div');
+            
+            switch(command) {
+                case 'help':
+                    commandOutput.className = 'command-output info';
+                    commandOutput.innerHTML = `
+                        Доступные команды:<br>
+                        <div class="help-command">
+                            <div class="help-command-name">help</div>
+                            <div class="help-command-desc">показать список доступных команд</div>
+                        </div>
+                        <div class="help-command">
+                            <div class="help-command-name">clear</div>
+                            <div class="help-command-desc">очистить экран терминала</div>
+                        </div>
+                        <div class="help-command">
+                            <div class="help-command-name">ls</div>
+                            <div class="help-command-desc">показать содержимое текущей директории</div>
+                        </div>
+                        <div class="help-command">
+                            <div class="help-command-name">pwd</div>
+                            <div class="help-command-desc">показать текущую директорию</div>
+                        </div>
+                        <div class="help-command">
+                            <div class="help-command-name">cd [dir]</div>
+                            <div class="help-command-desc">перейти в указанную директорию</div>
+                        </div>
+                        <div class="help-command">
+                            <div class="help-command-name">cat [file]</div>
+                            <div class="help-command-desc">показать содержимое файла</div>
+                        </div>
+                        <div class="help-command">
+                            <div class="help-command-name">echo [text]</div>
+                            <div class="help-command-desc">вывести текст</div>
+                        </div>
+                        <div class="help-command">
+                            <div class="help-command-name">date</div>
+                            <div class="help-command-desc">показать текущую дату и время</div>
+                        </div>
+                        <div class="help-command">
+                            <div class="help-command-name">whoami</div>
+                            <div class="help-command-desc">показать текущего пользователя</div>
+                        </div>
+                        <div class="help-command">
+                            <div class="help-command-name">neofetch</div>
+                            <div class="help-command-desc">показать информацию о системе</div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'clear':
+                    output.innerHTML = '';
+                    output.scrollTop = 0;
+                    return;
+                    
+                case 'ls':
+                    commandOutput.className = 'command-output';
+                    const path = currentDirectory === '~' ? '~' : currentDirectory;
+                    const dirContents = fileSystem[path]?.contents || {};
+                    
+                    let lsOutput = '';
+                    for (const item in dirContents) {
+                        const itemType = dirContents[item].type;
+                        if (itemType === 'directory') {
+                            lsOutput += `<span class="directory">${item}/</span>  `;
+                        } else if (itemType === 'executable') {
+                            lsOutput += `<span class="executable">${item}</span>  `;
+                        } else {
+                            lsOutput += `<span class="file">${item}</span>  `;
+                        }
+                    }
+                    commandOutput.innerHTML = lsOutput || 'Директория пуста';
+                    break;
+                    
+                case 'pwd':
+                    commandOutput.className = 'command-output';
+                    commandOutput.textContent = currentDirectory;
+                    break;
+                    
+                case 'cd':
+                    commandOutput.className = 'command-output';
+                    if (args.length < 2 || args[1] === '~') {
+                        currentDirectory = '~';
+                        commandOutput.textContent = '';
+                    } else if (args[1] === '..') {
+                        if (currentDirectory !== '~') {
+                            const pathParts = currentDirectory.split('/');
+                            pathParts.pop();
+                            currentDirectory = pathParts.join('/') || '~';
+                        }
+                        commandOutput.textContent = '';
+                    } else {
+                        const newPath = currentDirectory === '~' 
+                            ? `~/${args[1]}` 
+                            : `${currentDirectory}/${args[1]}`;
+                        
+                        if (fileSystem[newPath] && fileSystem[newPath].type === 'directory') {
+                            currentDirectory = newPath;
+                            commandOutput.textContent = '';
+                        } else {
+                            commandOutput.className = 'command-output error';
+                            commandOutput.textContent = `cd: ${args[1]}: Нет такой директории`;
+                        }
+                    }
+                    break;
+                    
+                case 'cat':
+                    commandOutput.className = 'command-output';
+                    if (args.length < 2) {
+                        commandOutput.className = 'command-output error';
+                        commandOutput.textContent = 'cat: не указано имя файла';
+                    } else {
+                        const fileName = args[1];
+                        let filePath;
+                        
+                        if (currentDirectory === '~') {
+                            filePath = `~/${fileName}`;
+                        } else {
+                            filePath = `${currentDirectory}/${fileName}`;
+                        }
+                        
+                        // Проверяем файл в текущей директории
+                        const currentDir = fileSystem[currentDirectory === '~' ? '~' : currentDirectory];
+                        const fileInCurrentDir = currentDir?.contents?.[fileName];
+                        
+                        if (fileInCurrentDir && (fileInCurrentDir.type === 'file' || fileInCurrentDir.type === 'executable')) {
+                            commandOutput.textContent = fileInCurrentDir.content || '(Файл пуст)';
+                        } else if (fileSystem[filePath] && fileSystem[filePath].type === 'file') {
+                            commandOutput.textContent = fileSystem[filePath].content || '(Файл пуст)';
+                        } else {
+                            commandOutput.className = 'command-output error';
+                            commandOutput.textContent = `cat: ${fileName}: Нет такого файла`;
+                        }
+                    }
+                    break;
+                    
+                case 'echo':
+                    commandOutput.className = 'command-output';
+                    commandOutput.textContent = args.slice(1).join(' ');
+                    break;
+                    
+                case 'date':
+                    commandOutput.className = 'command-output';
+                    const now = new Date();
+                    const options = { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        timeZoneName: 'short'
+                    };
+                    commandOutput.textContent = now.toLocaleDateString('ru-RU', options);
+                    break;
+                    
+                case 'whoami':
+                    commandOutput.className = 'command-output';
+                    commandOutput.textContent = 'user';
+                    break;
+                    
+                case 'neofetch':
+                    commandOutput.className = 'command-output';
+                    commandOutput.innerHTML = `
+                        <span style="color: #6a9fb5">            .-.</span><br>
+                        <span style="color: #6a9fb5">           |   |</span><br>
+                        <span style="color: #6a9fb5">        .-|   |-.</span><br>
+                        <span style="color: #6a9fb5">     .--| |   | |--.</span><br>
+                        <span style="color: #6a9fb5">    |   | |   | |   |</span><br>
+                        <span style="color: #6a9fb5">    |---| |   | |---|</span><br>
+                        <span style="color: #6a9fb5">    |   | |   | |   |</span><br>
+                        <span style="color: #6a9fb5">    |---| |   | |---|</span><br>
+                        <span style="color: #6a9fb5">    '---' '---' '---'</span><br>
+                        <br>
+                        <span class="prompt-user">user@linux</span><br>
+                        -----------------<br>
+                        <span class="info">ОС:</span> Эмулятор Linux Terminal 1.0<br>
+                        <span class="info">Ядро:</span> 5.15.0-html<br>
+                        <span class="info">ОЗУ:</span> 1024MB / 8192MB<br>
+                        <span class="info">Терминал:</span> web-terminal<br>
+                        <span class="info">Процессор:</span> Virtual CPU @ 3.0GHz<br>
+                    `;
+                    break;
+                    
+                default:
+                    commandOutput.className = 'command-output error';
+                    commandOutput.textContent = `${command}: команда не найдена. Введите 'help' для просмотра доступных команд.`;
+            }
+            
+            output.appendChild(commandOutput);
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        // Автофокус на поле ввода при загрузке
+        document.addEventListener('click', () => {
+            commandInput.focus();
+        });
+        
+        // Инициализируем приветственное сообщение
+        window.onload = () => {
+            commandInput.focus();
+        };
+    </script>
+</body>
+</html>

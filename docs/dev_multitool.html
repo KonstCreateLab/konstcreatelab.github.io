@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevToolkit - Мультитул для разработчиков</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #9b59b6;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .tools-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+        
+        .tab {
+            padding: 18px 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tab:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--secondary-color);
+            color: var(--secondary-color);
+            background-color: #f0f7ff;
+        }
+        
+        .tool-container {
+            display: none;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+        
+        .tool-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tool-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tool-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 992px) {
+            .tool-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        textarea, input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        textarea {
+            min-height: 200px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+        }
+        
+        textarea:focus, input:focus, select:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .result {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            min-height: 200px;
+            overflow-wrap: break-word;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+        
+        .result.success {
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .result.error {
+            border-left: 4px solid var(--danger-color);
+        }
+        
+        .tool-description {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+        }
+        
+        .utilities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .utility-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        
+        .utility-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .utility-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .utility-card p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 25px 0;
+            color: #666;
+            border-top: 1px solid #e9ecef;
+            font-size: 0.95rem;
+        }
+        
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .json-formatter {
+            min-height: 300px;
+        }
+        
+        .formatted-json {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .status-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-tools"></i> DevToolkit</h1>
+            <p class="subtitle">Комплексный набор инструментов для разработчиков. Кодирование, форматирование, преобразование данных и другие полезные утилиты в одном месте.</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="tools-tabs">
+            <div class="tab active" data-tool="json">
+                <i class="fas fa-code"></i> JSON Форматер
+            </div>
+            <div class="tab" data-tool="encoder">
+                <i class="fas fa-lock"></i> Кодировщик
+            </div>
+            <div class="tab" data-tool="timestamp">
+                <i class="fas fa-clock"></i> Временные метки
+            </div>
+            <div class="tab" data-tool="color">
+                <i class="fas fa-palette"></i> Конвертер цветов
+            </div>
+            <div class="tab" data-tool="utilities">
+                <i class="fas fa-th"></i> Другие утилиты
+            </div>
+        </div>
+        
+        <!-- JSON Formatter Tool -->
+        <div id="json-tool" class="tool-container active">
+            <h2 class="tool-title"><i class="fas fa-code"></i> Форматирование и валидация JSON</h2>
+            <p class="tool-description">Вставьте неформатированный JSON код для его красивого отображения или проверьте валидность JSON данных.</p>
+            
+            <div class="tool-content">
+                <div>
+                    <div class="input-group">
+                        <label for="json-input">Введите JSON код:</label>
+                        <textarea id="json-input" placeholder='{"name": "Пример", "data": [1, 2, 3]}'>{"tools":[{"name":"JSON Formatter","description":"Форматирует и валидирует JSON"},{"name":"Base64 Encoder","description":"Кодирует и декодирует данные в Base64"},{"name":"Timestamp Converter","description":"Конвертирует временные метки"},{"name":"Color Converter","description":"Конвертирует форматы цвета"}]}</textarea>
+                    </div>
+                    <div class="input-group">
+                        <button id="format-json" class="btn"><i class="fas fa-indent"></i> Форматировать</button>
+                        <button id="minify-json" class="btn"><i class="fas fa-compress"></i> Минифицировать</button>
+                        <button id="validate-json" class="btn btn-success"><i class="fas fa-check"></i> Проверить</button>
+                        <button id="clear-json" class="btn btn-danger"><i class="fas fa-trash"></i> Очистить</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="input-group">
+                        <label for="json-output">Результат:</label>
+                        <div id="json-output" class="result formatted-json"></div>
+                    </div>
+                    <div class="input-group">
+                        <button id="copy-json" class="btn"><i class="fas fa-copy"></i> Копировать</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Encoder/Decoder Tool -->
+        <div id="encoder-tool" class="tool-container">
+            <h2 class="tool-title"><i class="fas fa-lock"></i> Кодировщик/Декодировщик</h2>
+            <p class="tool-description">Кодируйте и декодируйте текст в форматах Base64, URL, HTML entities и других. Поддерживает Unicode (кириллицу).</p>
+            
+            <div class="tool-content">
+                <div>
+                    <div class="input-group">
+                        <label for="encoder-input">Исходный текст:</label>
+                        <textarea id="encoder-input" placeholder="Введите текст для кодирования или декодирования">Привет, мир! Этот текст будет закодирован.</textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="encoder-type">Тип преобразования:</label>
+                        <select id="encoder-type">
+                            <option value="base64-encode">Base64 Кодирование (UTF-8)</option>
+                            <option value="base64-decode">Base64 Декодирование (UTF-8)</option>
+                            <option value="url-encode">URL Кодирование</option>
+                            <option value="url-decode">URL Декодирование</option>
+                            <option value="html-encode">HTML Entities Кодирование</option>
+                            <option value="html-decode">HTML Entities Декодирование</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <button id="encode-decode" class="btn"><i class="fas fa-exchange-alt"></i> Преобразовать</button>
+                        <button id="clear-encoder" class="btn btn-danger"><i class="fas fa-trash"></i> Очистить</button>
+                    </div>
+                    <div id="encoder-status" class="status-message"></div>
+                </div>
+                <div>
+                    <div class="input-group">
+                        <label for="encoder-output">Результат:</label>
+                        <div id="encoder-output" class="result"></div>
+                    </div>
+                    <div class="input-group">
+                        <button id="copy-encoder" class="btn"><i class="fas fa-copy"></i> Копировать</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Timestamp Converter Tool -->
+        <div id="timestamp-tool" class="tool-container">
+            <h2 class="tool-title"><i class="fas fa-clock"></i> Конвертер временных меток</h2>
+            <p class="tool-description">Конвертируйте UNIX временные метки в читаемые даты и наоборот.</p>
+            
+            <div class="tool-content">
+                <div>
+                    <div class="input-group">
+                        <label for="timestamp-input">Введите UNIX timestamp или дату:</label>
+                        <input type="text" id="timestamp-input" placeholder="Например: 1690819200 или 2023-08-01 12:00:00" value="1690819200">
+                    </div>
+                    <div class="input-group">
+                        <label for="timestamp-direction">Направление конвертации:</label>
+                        <select id="timestamp-direction">
+                            <option value="timestamp-to-date">Timestamp → Дата</option>
+                            <option value="date-to-timestamp">Дата → Timestamp</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <button id="convert-timestamp" class="btn"><i class="fas fa-sync-alt"></i> Конвертировать</button>
+                        <button id="current-timestamp" class="btn"><i class="fas fa-clock"></i> Текущее время</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="input-group">
+                        <label for="timestamp-output">Результат:</label>
+                        <div id="timestamp-output" class="result"></div>
+                    </div>
+                    <div class="input-group">
+                        <button id="copy-timestamp" class="btn"><i class="fas fa-copy"></i> Копировать</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Color Converter Tool -->
+        <div id="color-tool" class="tool-container">
+            <h2 class="tool-title"><i class="fas fa-palette"></i> Конвертер цветов</h2>
+            <p class="tool-description">Конвертируйте цвета между форматами HEX, RGB, HSL и выбирайте цвета с помощью палитры.</p>
+            
+            <div class="tool-content">
+                <div>
+                    <div class="input-group">
+                        <label for="color-input">Введите цвет в любом формате:</label>
+                        <input type="text" id="color-input" placeholder="#3498db, rgb(52, 152, 219) или hsl(204, 70%, 53%)" value="#3498db">
+                        <div id="color-preview" class="color-preview" style="background-color: #3498db;"></div>
+                    </div>
+                    <div class="input-group">
+                        <label for="color-format">Целевой формат:</label>
+                        <select id="color-format">
+                            <option value="hex">HEX</option>
+                            <option value="rgb">RGB</option>
+                            <option value="hsl">HSL</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <button id="convert-color" class="btn"><i class="fas fa-exchange-alt"></i> Конвертировать</button>
+                        <button id="random-color" class="btn"><i class="fas fa-random"></i> Случайный цвет</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="input-group">
+                        <label for="color-output">Результат:</label>
+                        <div id="color-output" class="result"></div>
+                    </div>
+                    <div class="input-group">
+                        <button id="copy-color" class="btn"><i class="fas fa-copy"></i> Копировать</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Utilities Tool -->
+        <div id="utilities-tool" class="tool-container">
+            <h2 class="tool-title"><i class="fas fa-th"></i> Другие утилиты</h2>
+            <p class="tool-description">Различные полезные инструменты для разработчиков.</p>
+            
+            <div class="utilities-grid">
+                <div class="utility-card">
+                    <h3><i class="fas fa-hashtag"></i> Генератор хешей</h3>
+                    <p>Создайте хеши MD5, SHA-1, SHA-256 из текста.</p>
+                    <input type="text" id="hash-input" placeholder="Введите текст" class="form-control" value="Hello, World!">
+                    <select id="hash-algorithm" class="form-control">
+                        <option value="md5">MD5</option>
+                        <option value="sha1">SHA-1</option>
+                        <option value="sha256">SHA-256</option>
+                    </select>
+                    <button id="generate-hash" class="btn">Сгенерировать</button>
+                    <div id="hash-output" class="result" style="margin-top: 10px; min-height: 60px;"></div>
+                </div>
+                
+                <div class="utility-card">
+                    <h3><i class="fas fa-qrcode"></i> Генератор QR-кода</h3>
+                    <p>Создайте QR-код для URL, текста или контактной информации.</p>
+                    <input type="text" id="qr-input" placeholder="Введите текст или URL" class="form-control" value="https://github.com">
+                    <button id="generate-qr" class="btn">Сгенерировать QR</button>
+                    <div id="qr-output" style="margin-top: 10px; text-align: center;"></div>
+                </div>
+                
+                <div class="utility-card">
+                    <h3><i class="fas fa-random"></i> Генератор случайных данных</h3>
+                    <p>Создайте случайные строки, числа, пароли и UUID.</p>
+                    <select id="random-type" class="form-control">
+                        <option value="password">Пароль</option>
+                        <option value="uuid">UUID</option>
+                        <option value="number">Случайное число</option>
+                        <option value="string">Случайная строка</option>
+                    </select>
+                    <button id="generate-random" class="btn">Сгенерировать</button>
+                    <div id="random-output" class="result" style="margin-top: 10px; min-height: 60px;"></div>
+                </div>
+                
+                <div class="utility-card">
+                    <h3><i class="fas fa-text-height"></i> Текст утилиты</h3>
+                    <p>Подсчет символов, слов, преобразование регистра.</p>
+                    <textarea id="text-utility-input" placeholder="Введите текст" style="min-height: 100px; width: 100%; margin-bottom: 10px;">Пример текста для анализа</textarea>
+                    <button id="analyze-text" class="btn">Анализировать текст</button>
+                    <div id="text-analysis-output" class="result" style="margin-top: 10px; min-height: 100px; font-family: inherit;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>DevToolkit &copy; 2023 | Все инструменты для разработчиков в одном месте</p>
+            <p style="margin-top: 10px; font-size: 0.85rem;">Используйте эти инструменты бесплатно. Код работает полностью в браузере, данные не отправляются на сервер.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs and tool containers
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tool-container').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Show corresponding tool container
+                const toolId = this.getAttribute('data-tool');
+                document.getElementById(`${toolId}-tool`).classList.add('active');
+            });
+        });
+        
+        // JSON Formatter Tool
+        const jsonInput = document.getElementById('json-input');
+        const jsonOutput = document.getElementById('json-output');
+        
+        document.getElementById('format-json').addEventListener('click', function() {
+            try {
+                const parsedJson = JSON.parse(jsonInput.value);
+                jsonOutput.textContent = JSON.stringify(parsedJson, null, 2);
+                jsonOutput.className = 'result success formatted-json';
+            } catch (e) {
+                jsonOutput.textContent = 'Ошибка: неверный JSON формат\n' + e.message;
+                jsonOutput.className = 'result error';
+            }
+        });
+        
+        document.getElementById('minify-json').addEventListener('click', function() {
+            try {
+                const parsedJson = JSON.parse(jsonInput.value);
+                jsonOutput.textContent = JSON.stringify(parsedJson);
+                jsonOutput.className = 'result success formatted-json';
+            } catch (e) {
+                jsonOutput.textContent = 'Ошибка: неверный JSON формат\n' + e.message;
+                jsonOutput.className = 'result error';
+            }
+        });
+        
+        document.getElementById('validate-json').addEventListener('click', function() {
+            try {
+                JSON.parse(jsonInput.value);
+                jsonOutput.textContent = '✅ JSON валиден!';
+                jsonOutput.className = 'result success';
+            } catch (e) {
+                jsonOutput.textContent = '❌ Ошибка валидации JSON:\n' + e.message;
+                jsonOutput.className = 'result error';
+            }
+        });
+        
+        document.getElementById('clear-json').addEventListener('click', function() {
+            jsonInput.value = '';
+            jsonOutput.textContent = '';
+        });
+        
+        document.getElementById('copy-json').addEventListener('click', function() {
+            navigator.clipboard.writeText(jsonOutput.textContent).then(() => {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Скопировано!';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+        
+        // Initialize JSON formatter on page load
+        document.getElementById('format-json').click();
+        
+        // =============================================
+        // UTF-8 compatible Base64 encoding/decoding
+        // =============================================
+        
+        // Функции для работы с Base64 с поддержкой UTF-8
+        function base64EncodeUTF8(str) {
+            // Преобразование строки в UTF-8
+            const utf8Bytes = new TextEncoder().encode(str);
+            
+            // Преобразование байтов в base64
+            let binary = '';
+            for (let i = 0; i < utf8Bytes.length; i++) {
+                binary += String.fromCharCode(utf8Bytes[i]);
+            }
+            return btoa(binary);
+        }
+        
+        function base64DecodeUTF8(base64) {
+            try {
+                // Декодирование base64 в бинарную строку
+                const binary = atob(base64);
+                
+                // Преобразование бинарной строки в байты
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) {
+                    bytes[i] = binary.charCodeAt(i);
+                }
+                
+                // Декодирование UTF-8
+                return new TextDecoder().decode(bytes);
+            } catch (e) {
+                throw new Error('Некорректные Base64 данные: ' + e.message);
+            }
+        }
+        
+        // Encoder/Decoder Tool
+        const encoderInput = document.getElementById('encoder-input');
+        const encoderOutput = document.getElementById('encoder-output');
+        const encoderType = document.getElementById('encoder-type');
+        const encoderStatus = document.getElementById('encoder-status');
+        
+        function showStatus(element, message, isError = false) {
+            element.textContent = message;
+            element.className = isError ? 'status-message status-error' : 'status-message status-success';
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 3000);
+        }
+        
+        document.getElementById('encode-decode').addEventListener('click', function() {
+            const input = encoderInput.value;
+            const type = encoderType.value;
+            let result = '';
+            
+            try {
+                switch(type) {
+                    case 'base64-encode':
+                        result = base64EncodeUTF8(input);
+                        showStatus(encoderStatus, '✅ Текст успешно закодирован в Base64 (UTF-8)', false);
+                        break;
+                    case 'base64-decode':
+                        result = base64DecodeUTF8(input);
+                        showStatus(encoderStatus, '✅ Base64 успешно декодирован (UTF-8)', false);
+                        break;
+                    case 'url-encode':
+                        result = encodeURIComponent(input);
+                        showStatus(encoderStatus, '✅ Текст успешно закодирован в URL формат', false);
+                        break;
+                    case 'url-decode':
+                        result = decodeURIComponent(input);
+                        showStatus(encoderStatus, '✅ URL успешно декодирован', false);
+                        break;
+                    case 'html-encode':
+                        result = input.replace(/[&<>"']/g, 
+                            char => ({
+                                '&': '&amp;',
+                                '<': '&lt;',
+                                '>': '&gt;',
+                                '"': '&quot;',
+                                "'": '&#39;'
+                            })[char]
+                        );
+                        showStatus(encoderStatus, '✅ Текст успешно закодирован в HTML Entities', false);
+                        break;
+                    case 'html-decode':
+                        const textArea = document.createElement('textarea');
+                        textArea.innerHTML = input;
+                        result = textArea.value;
+                        showStatus(encoderStatus, '✅ HTML Entities успешно декодированы', false);
+                        break;
+                    default:
+                        result = 'Неизвестный тип преобразования';
+                        showStatus(encoderStatus, '❌ Неизвестный тип преобразования', true);
+                }
+                
+                encoderOutput.textContent = result;
+                encoderOutput.className = 'result success';
+            } catch (e) {
+                encoderOutput.textContent = 'Ошибка: ' + e.message;
+                encoderOutput.className = 'result error';
+                showStatus(encoderStatus, '❌ Ошибка: ' + e.message, true);
+            }
+        });
+        
+        document.getElementById('clear-encoder').addEventListener('click', function() {
+            encoderInput.value = '';
+            encoderOutput.textContent = '';
+            encoderStatus.style.display = 'none';
+        });
+        
+        document.getElementById('copy-encoder').addEventListener('click', function() {
+            navigator.clipboard.writeText(encoderOutput.textContent).then(() => {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Скопировано!';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+        
+        // Initialize encoder with sample conversion
+        document.getElementById('encode-decode').click();
+        
+        // Timestamp Converter Tool
+        const timestampInput = document.getElementById('timestamp-input');
+        const timestampOutput = document.getElementById('timestamp-output');
+        const timestampDirection = document.getElementById('timestamp-direction');
+        
+        document.getElementById('convert-timestamp').addEventListener('click', function() {
+            const input = timestampInput.value.trim();
+            const direction = timestampDirection.value;
+            
+            try {
+                if (direction === 'timestamp-to-date') {
+                    // Convert timestamp to date
+                    const timestamp = parseInt(input);
+                    if (isNaN(timestamp)) {
+                        throw new Error('Введите корректный числовой timestamp');
+                    }
+                    
+                    const date = new Date(timestamp * 1000);
+                    const formattedDate = date.toLocaleString('ru-RU', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        timeZoneName: 'short'
+                    });
+                    
+                    timestampOutput.textContent = `${formattedDate}\n\nISO формат: ${date.toISOString()}\nUTC: ${date.toUTCString()}`;
+                } else {
+                    // Convert date to timestamp
+                    const date = new Date(input);
+                    if (isNaN(date.getTime())) {
+                        throw new Error('Введите корректную дату');
+                    }
+                    
+                    const timestamp = Math.floor(date.getTime() / 1000);
+                    timestampOutput.textContent = `UNIX Timestamp: ${timestamp}\n\nМиллисекунды: ${date.getTime()}`;
+                }
+                
+                timestampOutput.className = 'result success';
+            } catch (e) {
+                timestampOutput.textContent = 'Ошибка: ' + e.message;
+                timestampOutput.className = 'result error';
+            }
+        });
+        
+        document.getElementById('current-timestamp').addEventListener('click', function() {
+            const now = Math.floor(Date.now() / 1000);
+            timestampInput.value = now.toString();
+            timestampDirection.value = 'timestamp-to-date';
+            document.getElementById('convert-timestamp').click();
+        });
+        
+        document.getElementById('copy-timestamp').addEventListener('click', function() {
+            navigator.clipboard.writeText(timestampOutput.textContent).then(() => {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Скопировано!';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+        
+        // Initialize timestamp converter
+        document.getElementById('convert-timestamp').click();
+        
+        // Color Converter Tool
+        const colorInput = document.getElementById('color-input');
+        const colorOutput = document.getElementById('color-output');
+        const colorFormat = document.getElementById('color-format');
+        const colorPreview = document.getElementById('color-preview');
+        
+        document.getElementById('convert-color').addEventListener('click', function() {
+            const input = colorInput.value.trim();
+            const format = colorFormat.value;
+            
+            try {
+                let colorObj = parseColor(input);
+                let result = '';
+                
+                switch(format) {
+                    case 'hex':
+                        result = colorObj.hex;
+                        break;
+                    case 'rgb':
+                        result = `rgb(${colorObj.r}, ${colorObj.g}, ${colorObj.b})`;
+                        break;
+                    case 'hsl':
+                        result = `hsl(${colorObj.h}, ${colorObj.s}%, ${colorObj.l}%)`;
+                        break;
+                }
+                
+                colorOutput.textContent = result;
+                colorOutput.className = 'result success';
+                colorPreview.style.backgroundColor = colorObj.hex;
+            } catch (e) {
+                colorOutput.textContent = 'Ошибка: ' + e.message;
+                colorOutput.className = 'result error';
+            }
+        });
+        
+        document.getElementById('random-color').addEventListener('click', function() {
+            const randomHex = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+            colorInput.value = randomHex;
+            document.getElementById('convert-color').click();
+        });
+        
+        document.getElementById('copy-color').addEventListener('click', function() {
+            navigator.clipboard.writeText(colorOutput.textContent).then(() => {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Скопировано!';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+        
+        // Parse color from any format
+        function parseColor(input) {
+            input = input.trim().toLowerCase();
+            
+            // HEX format
+            if (/^#?[0-9a-f]{6}$/i.test(input.replace('#', ''))) {
+                const hex = input.replace('#', '');
+                const r = parseInt(hex.substring(0, 2), 16);
+                const g = parseInt(hex.substring(2, 4), 16);
+                const b = parseInt(hex.substring(4, 6), 16);
+                
+                return {
+                    hex: '#' + hex,
+                    r, g, b,
+                    ...rgbToHsl(r, g, b)
+                };
+            }
+            
+            // RGB format
+            const rgbMatch = input.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+            if (rgbMatch) {
+                const r = parseInt(rgbMatch[1]);
+                const g = parseInt(rgbMatch[2]);
+                const b = parseInt(rgbMatch[3]);
+                
+                return {
+                    hex: rgbToHex(r, g, b),
+                    r, g, b,
+                    ...rgbToHsl(r, g, b)
+                };
+            }
+            
+            // HSL format
+            const hslMatch = input.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+            if (hslMatch) {
+                const h = parseInt(hslMatch[1]);
+                const s = parseInt(hslMatch[2]);
+                const l = parseInt(hslMatch[3]);
+                const rgb = hslToRgb(h, s, l);
+                
+                return {
+                    hex: rgbToHex(rgb.r, rgb.g, rgb.b),
+                    r: rgb.r,
+                    g: rgb.g,
+                    b: rgb.b,
+                    h, s, l
+                };
+            }
+            
+            throw new Error('Неизвестный формат цвета. Используйте HEX (#RRGGBB), RGB (rgb(r,g,b)) или HSL (hsl(h,s%,l%))');
+        }
+        
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(x => {
+                const hex = x.toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('');
+        }
+        
+        function rgbToHsl(r, g, b) {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+            
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            
+            if (max === min) {
+                h = s = 0; // achromatic
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                
+                switch(max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                
+                h /= 6;
+            }
+            
+            return {
+                h: Math.round(h * 360),
+                s: Math.round(s * 100),
+                l: Math.round(l * 100)
+            };
+        }
+        
+        function hslToRgb(h, s, l) {
+            s /= 100;
+            l /= 100;
+            
+            const c = (1 - Math.abs(2 * l - 1)) * s;
+            const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+            const m = l - c / 2;
+            
+            let r, g, b;
+            
+            if (h >= 0 && h < 60) {
+                [r, g, b] = [c, x, 0];
+            } else if (h >= 60 && h < 120) {
+                [r, g, b] = [x, c, 0];
+            } else if (h >= 120 && h < 180) {
+                [r, g, b] = [0, c, x];
+            } else if (h >= 180 && h < 240) {
+                [r, g, b] = [0, x, c];
+            } else if (h >= 240 && h < 300) {
+                [r, g, b] = [x, 0, c];
+            } else {
+                [r, g, b] = [c, 0, x];
+            }
+            
+            return {
+                r: Math.round((r + m) * 255),
+                g: Math.round((g + m) * 255),
+                b: Math.round((b + m) * 255)
+            };
+        }
+        
+        // Initialize color converter
+        document.getElementById('convert-color').click();
+        
+        // Hash Generator Utility
+        document.getElementById('generate-hash').addEventListener('click', function() {
+            const input = document.getElementById('hash-input').value;
+            const algorithm = document.getElementById('hash-algorithm').value;
+            
+            // Для демонстрации используем простую реализацию
+            // В реальном приложении следует использовать криптографические библиотеки
+            async function generateHash(text, algo) {
+                // Создаем простой "хеш" для демонстрации
+                const encoder = new TextEncoder();
+                const data = encoder.encode(text);
+                
+                if (window.crypto && window.crypto.subtle) {
+                    try {
+                        let hashBuffer;
+                        if (algo === 'sha256') {
+                            hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                        } else if (algo === 'sha1') {
+                            hashBuffer = await crypto.subtle.digest('SHA-1', data);
+                        } else {
+                            // Для MD5 используем простую реализацию
+                            return 'md5_' + Array.from(data)
+                                .map(b => b.toString(16).padStart(2, '0'))
+                                .join('').substring(0, 32);
+                        }
+                        
+                        const hashArray = Array.from(new Uint8Array(hashBuffer));
+                        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                    } catch (e) {
+                        console.error('Ошибка генерации хеша:', e);
+                    }
+                }
+                
+                // Fallback: простая реализация для демонстрации
+                const simpleHash = Array.from(data)
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join('')
+                    .substring(0, 32);
+                    
+                return algo + '_' + simpleHash;
+            }
+            
+            generateHash(input, algorithm).then(hash => {
+                document.getElementById('hash-output').textContent = hash;
+            });
+        });
+        
+        // QR Code Generator Utility
+        document.getElementById('generate-qr').addEventListener('click', function() {
+            const input = document.getElementById('qr-input').value;
+            const qrOutput = document.getElementById('qr-output');
+            
+            // В реальном приложении используйте библиотеку для генерации QR-кодов
+            // Для демонстрации покажем "симуляцию" QR-кода
+            qrOutput.innerHTML = `
+                <div style="background-color: white; padding: 15px; display: inline-block; border: 1px solid #ddd; border-radius: 8px;">
+                    <div style="font-family: monospace; line-height: 1; letter-spacing: 2px; font-size: 12px; background: white; padding: 10px;">
+                        ██████████████████<br>
+                        ██░░░░░░████░░░░██<br>
+                        ██░████░██░░░██░██<br>
+                        ██░████░█░██░░░███<br>
+                        ██░████░███░█░███<br>
+                        ██░░░░░░███░░░░░██<br>
+                        ██████████████████<br>
+                        ░░░██░░░█░███░░██░<br>
+                        █░░█░░██░░███░█░░█<br>
+                        ░██░█░░░███░░██░░░<br>
+                    </div>
+                    <p style="margin-top: 10px; font-size: 0.9rem; max-width: 200px;">QR-код для: <strong>${input.substring(0, 25)}${input.length > 25 ? '...' : ''}</strong></p>
+                    <p style="margin-top: 5px; font-size: 0.75rem; color: #666;">В реальном приложении здесь будет сгенерирован настоящий QR-код с использованием библиотеки</p>
+                </div>
+            `;
+        });
+        
+        // Random Data Generator Utility
+        document.getElementById('generate-random').addEventListener('click', function() {
+            const type = document.getElementById('random-type').value;
+            let result = '';
+            
+            if (type === 'password') {
+                const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+                const numbers = '0123456789';
+                const symbols = '!@#$%^&*';
+                const allChars = uppercase + lowercase + numbers + symbols;
+                
+                // Гарантируем наличие хотя бы одного символа из каждой группы
+                result = uppercase[Math.floor(Math.random() * uppercase.length)] +
+                        lowercase[Math.floor(Math.random() * lowercase.length)] +
+                        numbers[Math.floor(Math.random() * numbers.length)] +
+                        symbols[Math.floor(Math.random() * symbols.length)];
+                
+                // Добавляем остальные символы
+                for (let i = 0; i < 8; i++) {
+                    result += allChars[Math.floor(Math.random() * allChars.length)];
+                }
+                
+                // Перемешиваем строку
+                result = result.split('').sort(() => Math.random() - 0.5).join('');
+            } else if (type === 'uuid') {
+                result = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            } else if (type === 'number') {
+                const min = 1;
+                const max = 1000000;
+                result = Math.floor(Math.random() * (max - min + 1) + min).toString();
+            } else if (type === 'string') {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                result = Array.from({length: 12}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+            }
+            
+            document.getElementById('random-output').textContent = result;
+        });
+        
+        // Text Analysis Utility
+        document.getElementById('analyze-text').addEventListener('click', function() {
+            const text = document.getElementById('text-utility-input').value;
+            
+            // Подсчет символов
+            const charCount = text.length;
+            
+            // Подсчет символов без пробелов
+            const charCountNoSpaces = text.replace(/\s/g, '').length;
+            
+            // Подсчет слов
+            const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            
+            // Подсчет строк
+            const lineCount = text === '' ? 0 : text.split('\n').length;
+            
+            // Определение языка (простая эвристика)
+            const hasCyrillic = /[а-яА-ЯёЁ]/.test(text);
+            const hasLatin = /[a-zA-Z]/.test(text);
+            let language = 'неопределен';
+            if (hasCyrillic && !hasLatin) language = 'русский';
+            else if (hasLatin && !hasCyrillic) language = 'английский';
+            else if (hasCyrillic && hasLatin) language = 'смешанный';
+            
+            const analysisResult = `
+                Статистика текста:
+                -----------------
+                Символов (всего): ${charCount}
+                Символов (без пробелов): ${charCountNoSpaces}
+                Слов: ${wordCount}
+                Строк: ${lineCount}
+                Язык: ${language}
+                
+                Преобразования:
+                -----------------
+                Верхний регистр: ${text.toUpperCase()}
+                Нижний регистр: ${text.toLowerCase()}
+                
+                ${text.length > 100 ? '(Текст обрезан для отображения)' : ''}
+            `;
+            
+            document.getElementById('text-analysis-output').textContent = analysisResult;
+        });
+        
+        // Initialize utilities with some data
+        document.getElementById('generate-hash').click();
+        document.getElementById('generate-qr').click();
+        document.getElementById('generate-random').click();
+        document.getElementById('analyze-text').click();
+    </script>
+</body>
+</html>

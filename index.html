@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ItzKonst - Мой сайт</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #6c63ff;
+            --secondary: #4a44c6;
+            --accent: #ff6584;
+            --dark: #2a2a3c;
+            --light: #f8f9fa;
+            --gray: #e9ecef;
+            --text: #333;
+            --text-light: #6c757d;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+        
+        header {
+            background: linear-gradient(to right, var(--dark), var(--secondary));
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%236c63ff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--accent);
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+        
+        .tagline {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .intro-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid var(--primary);
+        }
+        
+        .intro-card h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .intro-card p {
+            line-height: 1.7;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+        
+        .highlight {
+            background-color: rgba(108, 99, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .highlight p {
+            color: var(--text);
+            font-weight: 500;
+        }
+        
+        .pages-section {
+            margin-top: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: var(--primary);
+        }
+        
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .page-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.07);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .page-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            padding: 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .card-icon {
+            font-size: 1.8rem;
+            background: rgba(255, 255, 255, 0.2);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .card-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-description {
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+        
+        .card-link {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(108, 99, 255, 0.3);
+        }
+        
+        .card-link:hover {
+            background: var(--secondary);
+            transform: scale(1.05);
+        }
+        
+        .card-link i {
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card-link:hover i {
+            transform: translateX(4px);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            color: var(--text-light);
+            border-top: 1px solid var(--gray);
+        }
+        
+        .footer-text {
+            font-size: 0.9rem;
+        }
+        
+        .konst-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .pages-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .intro-card, .page-card {
+                padding: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .logo-icon {
+                font-size: 2rem;
+            }
+            
+            h1 {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <i class="fas fa-code logo-icon"></i>
+            <h1>ItzKonst</h1>
+        </div>
+        <p class="tagline">Добро пожаловать на мой сайт! Здесь ты можешь найти полезную информацию, инструменты и файлы для работы и развлечения.</p>
+    </header>
+    
+    <div class="container">
+        <div class="intro-card">
+            <h2><i class="fas fa-info-circle"></i> О сайте</h2>
+            <p>Привет! Это мой сайт. Здесь ты можешь найти некоторую информацию и файлы от Конста!</p>
+            <p>На этом сайте собраны различные полезные инструменты и мини-приложения, которые могут пригодиться как разработчикам, так и обычным пользователям.</p>
+            
+            <div class="highlight">
+                <p><i class="fas fa-exclamation-circle"></i> <strong>Примечание:</strong> Ты сейчас находишься на главной странице сайта. Чтобы перейти к конкретному инструменту, выбери одну из карточек ниже.</p>
+            </div>
+        </div>
+        
+        <div class="pages-section">
+            <h2 class="section-title"><i class="fas fa-folder-open"></i> Доступные страницы</h2>
+            
+            <div class="pages-grid">
+                <!-- Змейка -->
+                <div class="page-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="card-title">Змейка</div>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-description">Классическая игра "Змейка" в современном исполнении. Управляйте змейкой, собирайте еду и старайтесь не врезаться в стены или собственный хвост.</p>
+                        <a href="https://konstcreatelab.github.io/snake" class="card-link" target="_blank">Открыть <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Колесо фортуны -->
+                <div class="page-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-dharmachakra"></i>
+                        </div>
+                        <div class="card-title">Колесо фортуны</div>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-description">Вращайте колесо фортуны для принятия случайных решений, выбора победителей или просто для развлечения. Настройте сектора под свои нужды.</p>
+                        <a href="https://konstcreatelab.github.io/spinner" class="card-link" target="_blank">Открыть <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Инструменты для разработчиков -->
+                <div class="page-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="card-title">Инструменты для разработчиков</div>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-description">Набор полезных инструментов для разработчиков: преобразователи кода, валидаторы, генераторы и другие утилиты, которые помогут в работе.</p>
+                        <a href="https://konstcreatelab.github.io/dev_multitool" class="card-link" target="_blank">Открыть <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Терминал Linux -->
+                <div class="page-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-terminal"></i>
+                        </div>
+                        <div class="card-title">Терминал Linux</div>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-description">Эмулятор терминала Linux прямо в браузере. Выполняйте команды, изучайте основы работы с терминалом и практикуйте навыки командной строки.</p>
+                        <a href="https://konstcreatelab.github.io/linuxterminal" class="card-link" target="_blank">Открыть <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p class="footer-text">Все инструменты разработаны с ❤️ для удобства пользователей</p>
+            <div class="konst-badge">
+                <i class="fas fa-user-cog"></i>
+                <span>От ItzKonst</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Добавим интерактивности карточкам
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.page-card');
+            
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    const icon = this.querySelector('.card-icon i');
+                    if (icon.classList.contains('fa-gamepad')) {
+                        icon.classList.add('fa-spin');
+                        setTimeout(() => icon.classList.remove('fa-spin'), 1000);
+                    } else if (icon.classList.contains('fa-dharmachakra')) {
+                        icon.classList.add('fa-spin');
+                    } else if (icon.classList.contains('fa-terminal')) {
+                        icon.style.transform = 'scale(1.2)';
+                    }
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    const icon = this.querySelector('.card-icon i');
+                    if (icon.classList.contains('fa-dharmachakra')) {
+                        icon.classList.remove('fa-spin');
+                    } else if (icon.classList.contains('fa-terminal')) {
+                        icon.style.transform = 'scale(1)';
+                    }
+                });
+            });
+            
+            // Анимация появления элементов
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            // Настройка анимации для карточек
+            const pageCards = document.querySelectorAll('.page-card');
+            pageCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                card.style.transitionDelay = `${index * 0.1}s`;
+                observer.observe(card);
+            });
+            
+            // Анимация для заголовка
+            const title = document.querySelector('.section-title');
+            title.style.opacity = '0';
+            title.style.transform = 'translateX(-20px)';
+            title.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            
+            setTimeout(() => {
+                title.style.opacity = '1';
+                title.style.transform = 'translateX(0)';
+            }, 300);
+        });
+    </script>
+</body>
+</html>
