@@ -1,2 +1,2 @@
 # readme
-go to https://konstcreatelab.github.io/index.html for continue...
+go to https://konstcreatelab.github.io
