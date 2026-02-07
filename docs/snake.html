@@ -1,692 +1,1 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Классическая Змейка</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #1a2a3a, #0f1a25);
-            color: #fff;
-            padding: 20px;
-        }
-        
-        .game-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 800px;
-            width: 100%;
-            gap: 20px;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        
-        .header h1 {
-            font-size: 2.8rem;
-            color: #4CAF50;
-            text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
-            margin-bottom: 5px;
-        }
-        
-        .header p {
-            color: #aaa;
-            font-size: 1.1rem;
-        }
-        
-        .game-info {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            background-color: rgba(0, 0, 0, 0.3);
-            padding: 15px 25px;
-            border-radius: 10px;
-            border: 1px solid #333;
-        }
-        
-        .score-container, .high-score-container {
-            text-align: center;
-        }
-        
-        .score-label, .high-score-label {
-            font-size: 1rem;
-            color: #aaa;
-        }
-        
-        .score, .high-score {
-            font-size: 2.2rem;
-            font-weight: bold;
-            color: #FFC107;
-        }
-        
-        .game-wrapper {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-            width: 100%;
-        }
-        
-        .game-board-container {
-            position: relative;
-        }
-        
-        #game-board {
-            border: 3px solid #333;
-            border-radius: 5px;
-            background-color: #111;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
-        }
-        
-        .controls {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 20px;
-            flex: 1;
-            min-width: 250px;
-        }
-        
-        .instructions {
-            background-color: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #333;
-        }
-        
-        .instructions h3 {
-            color: #4CAF50;
-            margin-bottom: 10px;
-            font-size: 1.4rem;
-        }
-        
-        .instructions ul {
-            padding-left: 20px;
-            color: #ccc;
-            line-height: 1.6;
-        }
-        
-        .instructions li {
-            margin-bottom: 8px;
-        }
-        
-        .buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        button {
-            padding: 15px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        #start-btn {
-            background-color: #4CAF50;
-            color: white;
-        }
-        
-        #start-btn:hover {
-            background-color: #3d8b40;
-            transform: translateY(-2px);
-        }
-        
-        #reset-btn {
-            background-color: #f44336;
-            color: white;
-        }
-        
-        #reset-btn:hover {
-            background-color: #d32f2f;
-            transform: translateY(-2px);
-        }
-        
-        #pause-btn {
-            background-color: #2196F3;
-            color: white;
-        }
-        
-        #pause-btn:hover {
-            background-color: #0b7dda;
-            transform: translateY(-2px);
-        }
-        
-        .game-status {
-            font-size: 1.2rem;
-            text-align: center;
-            padding: 10px;
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 8px;
-            margin-top: 10px;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .mobile-controls {
-            display: none;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 20px;
-            max-width: 250px;
-        }
-        
-        .mobile-controls button {
-            padding: 20px;
-            font-size: 1.5rem;
-        }
-        
-        .up-btn {
-            grid-column: 2;
-            grid-row: 1;
-        }
-        
-        .left-btn {
-            grid-column: 1;
-            grid-row: 2;
-        }
-        
-        .down-btn {
-            grid-column: 2;
-            grid-row: 2;
-        }
-        
-        .right-btn {
-            grid-column: 3;
-            grid-row: 2;
-        }
-        
-        @media (max-width: 768px) {
-            .game-wrapper {
-                flex-direction: column;
-            }
-            
-            .mobile-controls {
-                display: grid;
-            }
-            
-            #game-board {
-                width: 100%;
-                max-width: 400px;
-                height: auto;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 2.2rem;
-            }
-            
-            .game-info {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .score, .high-score {
-                font-size: 1.8rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="game-container">
-        <div class="header">
-            <h1>ЗМЕЙКА (от ItzKonst)</h1>
-            <p>Классическая игра на JavaScript</p>
-        </div>
-        
-        <div class="game-info">
-            <div class="score-container">
-                <div class="score-label">СЧЕТ</div>
-                <div class="score" id="score">0</div>
-            </div>
-            <div class="high-score-container">
-                <div class="high-score-label">РЕКОРД</div>
-                <div class="high-score" id="high-score">0</div>
-            </div>
-        </div>
-        
-        <div class="game-wrapper">
-            <div class="game-board-container">
-                <canvas id="game-board" width="500" height="500"></canvas>
-                <div class="game-status" id="game-status">Нажмите "СТАРТ", чтобы начать игру</div>
-            </div>
-            
-            <div class="controls">
-                <div class="instructions">
-                    <h3>Управление игрой</h3>
-                    <ul>
-                        <li>Используйте <strong>стрелки на клавиатуре</strong> для управления змейкой</li>
-                        <li>Собирайте <span style="color:#FFC107">желтую еду</span>, чтобы увеличить счет</li>
-                        <li>Избегайте столкновений со стенами и с собственным хвостом</li>
-                        <li>Каждая съеденная еда увеличивает длину змейки</li>
-                        <li>Цель: набрать как можно больше очков</li>
-                    </ul>
-                </div>
-                
-                <div class="buttons">
-                    <button id="start-btn">СТАРТ</button>
-                    <button id="pause-btn">ПАУЗА</button>
-                    <button id="reset-btn">СБРОС</button>
-                </div>
-                
-                <div class="mobile-controls">
-                    <button class="up-btn" id="up-btn">↑</button>
-                    <button class="left-btn" id="left-btn">←</button>
-                    <button class="down-btn" id="down-btn">↓</button>
-                    <button class="right-btn" id="right-btn">→</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Инициализация элементов
-        const canvas = document.getElementById('game-board');
-        const ctx = canvas.getContext('2d');
-        const scoreElement = document.getElementById('score');
-        const highScoreElement = document.getElementById('high-score');
-        const gameStatusElement = document.getElementById('game-status');
-        const startButton = document.getElementById('start-btn');
-        const pauseButton = document.getElementById('pause-btn');
-        const resetButton = document.getElementById('reset-btn');
-        
-        // Мобильные кнопки управления
-        const upButton = document.getElementById('up-btn');
-        const downButton = document.getElementById('down-btn');
-        const leftButton = document.getElementById('left-btn');
-        const rightButton = document.getElementById('right-btn');
-        
-        // Параметры игры
-        const gridSize = 20; // Размер одной клетки
-        const gridWidth = canvas.width / gridSize;
-        const gridHeight = canvas.height / gridSize;
-        
-        let snake = [];
-        let food = {};
-        let direction = 'right';
-        let nextDirection = 'right';
-        let gameSpeed = 120; // Скорость игры (меньше = быстрее)
-        let gameInterval;
-        let score = 0;
-        let highScore = localStorage.getItem('snakeHighScore') || 0;
-        let gameRunning = false;
-        let gamePaused = false;
-        
-        // Установка рекорда
-        highScoreElement.textContent = highScore;
-        
-        // Инициализация игры
-        function initGame() {
-            // Начальная позиция змейки
-            snake = [
-                {x: 5, y: 10},
-                {x: 4, y: 10},
-                {x: 3, y: 10}
-            ];
-            
-            // Начальное направление
-            direction = 'right';
-            nextDirection = 'right';
-            
-            // Создание первой еды
-            generateFood();
-            
-            // Сброс счета
-            score = 0;
-            scoreElement.textContent = score;
-            
-            // Обновление статуса
-            gameStatusElement.textContent = 'Игра началась! Управляйте змейкой с помощью стрелок';
-            gameStatusElement.style.color = '#4CAF50';
-        }
-        
-        // Генерация еды
-        function generateFood() {
-            let foodOnSnake;
-            
-            do {
-                foodOnSnake = false;
-                food = {
-                    x: Math.floor(Math.random() * gridWidth),
-                    y: Math.floor(Math.random() * gridHeight)
-                };
-                
-                // Проверяем, не появилась ли еда на змейке
-                for (let segment of snake) {
-                    if (segment.x === food.x && segment.y === food.y) {
-                        foodOnSnake = true;
-                        break;
-                    }
-                }
-            } while (foodOnSnake);
-        }
-        
-        // Отрисовка игры
-        function drawGame() {
-            // Очистка холста
-            ctx.fillStyle = '#111';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Отрисовка сетки
-            ctx.strokeStyle = '#222';
-            ctx.lineWidth = 0.5;
-            
-            for (let x = 0; x < gridWidth; x++) {
-                for (let y = 0; y < gridHeight; y++) {
-                    ctx.strokeRect(x * gridSize, y * gridSize, gridSize, gridSize);
-                }
-            }
-            
-            // Отрисовка змейки
-            snake.forEach((segment, index) => {
-                // Голова змейки
-                if (index === 0) {
-                    ctx.fillStyle = '#4CAF50';
-                    ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
-                    
-                    // Глаза змейки
-                    ctx.fillStyle = '#000';
-                    let eyeSize = gridSize / 5;
-                    
-                    // Позиция глаз в зависимости от направления
-                    let leftEyeX, leftEyeY, rightEyeX, rightEyeY;
-                    
-                    switch(direction) {
-                        case 'right':
-                            leftEyeX = segment.x * gridSize + gridSize - eyeSize*2;
-                            leftEyeY = segment.y * gridSize + eyeSize*2;
-                            rightEyeX = segment.x * gridSize + gridSize - eyeSize*2;
-                            rightEyeY = segment.y * gridSize + gridSize - eyeSize*3;
-                            break;
-                        case 'left':
-                            leftEyeX = segment.x * gridSize + eyeSize;
-                            leftEyeY = segment.y * gridSize + eyeSize*2;
-                            rightEyeX = segment.x * gridSize + eyeSize;
-                            rightEyeY = segment.y * gridSize + gridSize - eyeSize*3;
-                            break;
-                        case 'up':
-                            leftEyeX = segment.x * gridSize + eyeSize*2;
-                            leftEyeY = segment.y * gridSize + eyeSize;
-                            rightEyeX = segment.x * gridSize + gridSize - eyeSize*3;
-                            rightEyeY = segment.y * gridSize + eyeSize;
-                            break;
-                        case 'down':
-                            leftEyeX = segment.x * gridSize + eyeSize*2;
-                            leftEyeY = segment.y * gridSize + gridSize - eyeSize*2;
-                            rightEyeX = segment.x * gridSize + gridSize - eyeSize*3;
-                            rightEyeY = segment.y * gridSize + gridSize - eyeSize*2;
-                            break;
-                    }
-                    
-                    ctx.fillRect(leftEyeX, leftEyeY, eyeSize, eyeSize);
-                    ctx.fillRect(rightEyeX, rightEyeY, eyeSize, eyeSize);
-                } 
-                // Тело змейки
-                else {
-                    ctx.fillStyle = '#8BC34A';
-                    ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
-                    
-                    // Легкий градиент для тела
-                    ctx.fillStyle = '#7CB342';
-                    ctx.fillRect(segment.x * gridSize + 2, segment.y * gridSize + 2, gridSize - 4, gridSize - 4);
-                }
-            });
-            
-            // Отрисовка еды
-            ctx.fillStyle = '#FFC107';
-            ctx.beginPath();
-            ctx.arc(
-                food.x * gridSize + gridSize/2,
-                food.y * gridSize + gridSize/2,
-                gridSize/2 - 2,
-                0,
-                Math.PI * 2
-            );
-            ctx.fill();
-            
-            // Эффект свечения еды
-            ctx.fillStyle = 'rgba(255, 193, 7, 0.3)';
-            ctx.beginPath();
-            ctx.arc(
-                food.x * gridSize + gridSize/2,
-                food.y * gridSize + gridSize/2,
-                gridSize/2,
-                0,
-                Math.PI * 2
-            );
-            ctx.fill();
-        }
-        
-        // Обновление состояния игры
-        function updateGame() {
-            // Обновление направления
-            direction = nextDirection;
-            
-            // Создание новой головы на основе текущего направления
-            const head = {x: snake[0].x, y: snake[0].y};
-            
-            switch(direction) {
-                case 'up':
-                    head.y -= 1;
-                    break;
-                case 'down':
-                    head.y += 1;
-                    break;
-                case 'left':
-                    head.x -= 1;
-                    break;
-                case 'right':
-                    head.x += 1;
-                    break;
-            }
-            
-            // Проверка столкновения со стенами
-            if (
-                head.x < 0 || 
-                head.x >= gridWidth || 
-                head.y < 0 || 
-                head.y >= gridHeight
-            ) {
-                gameOver();
-                return;
-            }
-            
-            // Проверка столкновения с собственным телом
-            for (let segment of snake) {
-                if (segment.x === head.x && segment.y === head.y) {
-                    gameOver();
-                    return;
-                }
-            }
-            
-            // Добавление новой головы
-            snake.unshift(head);
-            
-            // Проверка, съела ли змейка еду
-            if (head.x === food.x && head.y === food.y) {
-                // Увеличение счета
-                score += 10;
-                scoreElement.textContent = score;
-                
-                // Обновление рекорда
-                if (score > highScore) {
-                    highScore = score;
-                    highScoreElement.textContent = highScore;
-                    localStorage.setItem('snakeHighScore', highScore);
-                }
-                
-                // Генерация новой еды
-                generateFood();
-                
-                // Увеличение скорости игры каждые 50 очков
-                if (score % 50 === 0 && gameSpeed > 50) {
-                    gameSpeed -= 5;
-                    clearInterval(gameInterval);
-                    gameInterval = setInterval(updateGame, gameSpeed);
-                }
-            } else {
-                // Удаление хвоста, если еда не съедена
-                snake.pop();
-            }
-            
-            // Отрисовка обновленной игры
-            drawGame();
-        }
-        
-        // Обработка окончания игры
-        function gameOver() {
-            gameRunning = false;
-            clearInterval(gameInterval);
-            
-            gameStatusElement.textContent = `Игра окончена! Ваш счет: ${score}. Нажмите "СБРОС", чтобы начать заново`;
-            gameStatusElement.style.color = '#f44336';
-        }
-        
-        // Обработка нажатий клавиш
-        function handleKeyDown(event) {
-            // Игнорируем нажатия, если игра не запущена или на паузе
-            if (!gameRunning || gamePaused) return;
-            
-            switch(event.key) {
-                case 'ArrowUp':
-                    if (direction !== 'down') nextDirection = 'up';
-                    break;
-                case 'ArrowDown':
-                    if (direction !== 'up') nextDirection = 'down';
-                    break;
-                case 'ArrowLeft':
-                    if (direction !== 'right') nextDirection = 'left';
-                    break;
-                case 'ArrowRight':
-                    if (direction !== 'left') nextDirection = 'right';
-                    break;
-                case ' ':
-                    // Пробел для паузы
-                    togglePause();
-                    break;
-            }
-        }
-        
-        // Запуск игры
-        function startGame() {
-            if (gameRunning) return;
-            
-            if (!gamePaused) {
-                initGame();
-            }
-            
-            gameRunning = true;
-            gamePaused = false;
-            gameInterval = setInterval(updateGame, gameSpeed);
-            
-            startButton.textContent = 'СТАРТ';
-            pauseButton.textContent = 'ПАУЗА';
-            gameStatusElement.textContent = 'Игра идет... Управляйте змейкой с помощью стрелок';
-            gameStatusElement.style.color = '#4CAF50';
-        }
-        
-        // Пауза/возобновление игры
-        function togglePause() {
-            if (!gameRunning) return;
-            
-            gamePaused = !gamePaused;
-            
-            if (gamePaused) {
-                clearInterval(gameInterval);
-                pauseButton.textContent = 'ПРОДОЛЖИТЬ';
-                gameStatusElement.textContent = 'Игра на паузе. Нажмите "ПРОДОЛЖИТЬ", чтобы продолжить';
-                gameStatusElement.style.color = '#FFC107';
-            } else {
-                gameInterval = setInterval(updateGame, gameSpeed);
-                pauseButton.textContent = 'ПАУЗА';
-                gameStatusElement.textContent = 'Игра идет... Управляйте змейкой с помощью стрелок';
-                gameStatusElement.style.color = '#4CAF50';
-            }
-        }
-        
-        // Сброс игры
-        function resetGame() {
-            clearInterval(gameInterval);
-            gameRunning = false;
-            gamePaused = false;
-            initGame();
-            drawGame();
-            
-            startButton.textContent = 'СТАРТ';
-            pauseButton.textContent = 'ПАУЗА';
-            gameStatusElement.textContent = 'Готовы начать? Нажмите "СТАРТ"';
-            gameStatusElement.style.color = '#fff';
-        }
-        
-        // Инициализация управления для мобильных устройств
-        function initMobileControls() {
-            upButton.addEventListener('click', () => {
-                if (direction !== 'down') nextDirection = 'up';
-            });
-            
-            downButton.addEventListener('click', () => {
-                if (direction !== 'up') nextDirection = 'down';
-            });
-            
-            leftButton.addEventListener('click', () => {
-                if (direction !== 'right') nextDirection = 'left';
-            });
-            
-            rightButton.addEventListener('click', () => {
-                if (direction !== 'left') nextDirection = 'right';
-            });
-        }
-        
-        // Настройка обработчиков событий
-        document.addEventListener('keydown', handleKeyDown);
-        startButton.addEventListener('click', startGame);
-        pauseButton.addEventListener('click', togglePause);
-        resetButton.addEventListener('click', resetGame);
-        
-        // Инициализация игры
-        initGame();
-        drawGame();
-        initMobileControls();
-        
-        // Адаптация размера холста для мобильных устройств
-        function resizeCanvas() {
-            const maxWidth = Math.min(500, window.innerWidth - 40);
-            
-            if (maxWidth < 500) {
-                canvas.width = maxWidth;
-                canvas.height = maxWidth;
-            } else {
-                canvas.width = 500;
-                canvas.height = 500;
-            }
-            
-            drawGame();
-        }
-        
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-    </script>
-</body>
-</html>
+<script>var s="=\"EPDUZQF!iunm?=iunm!mboh>#sv#?=ifbe?!!!!=nfub!dibstfu>#VUG.9#?!!!!=nfub!obnf>#wjfxqpsu#!dpoufou>#xjeui>efwjdf.xjeui-!jojujbm.tdbmf>2/1#?!!!!=ujumf?ћѼѱ҂҂ѹ҈Ѷ҂ѻѱҐ!јѽѶѺѻѱ=0ujumf?!!!!=tuzmf?!!!!!!!!+!|!!!!!!!!!!!!nbshjo;!1<!!!!!!!!!!!!qbeejoh;!1<!!!!!!!!!!!!cpy.tj{joh;!cpsefs.cpy<!!!!!!!!!!!!gpou.gbnjmz;!(Tfhpf!VJ(-!Ubipnb-!Hfofwb-!Wfsebob-!tbot.tfsjg<!!!!!!!!~!!!!!!!!!!!!!!!!cpez!|!!!!!!!!!!!!ejtqmbz;!gmfy<!!!!!!!!!!!!kvtujgz.dpoufou;!dfoufs<!!!!!!!!!!!!bmjho.jufnt;!dfoufs<!!!!!!!!!!!!njo.ifjhiu;!211wi<!!!!!!!!!!!!cbdlhspvoe;!mjofbs.hsbejfou)246efh-!$2b3b4b-!$1g2b36*<!!!!!!!!!!!!dpmps;!$ggg<!!!!!!!!!!!!qbeejoh;!31qy<!!!!!!!!~!!!!!!!!!!!!!!!!/hbnf.dpoubjofs!|!!!!!!!!!!!!ejtqmbz;!gmfy<!!!!!!!!!!!!gmfy.ejsfdujpo;!dpmvno<!!!!!!!!!!!!bmjho.jufnt;!dfoufs<!!!!!!!!!!!!nby.xjeui;!911qy<!!!!!!!!!!!!xjeui;!211&<!!!!!!!!!!!!hbq;!31qy<!!!!!!!!~!!!!!!!!!!!!!!!!/ifbefs!|!!!!!!!!!!!!ufyu.bmjho;!dfoufs<!!!!!!!!!!!!nbshjo.cpuupn;!21qy<!!!!!!!!~!!!!!!!!!!!!!!!!/ifbefs!i2!|!!!!!!!!!!!!gpou.tj{f;!3/9sfn<!!!!!!!!!!!!dpmps;!$5DBG61<!!!!!!!!!!!!ufyu.tibepx;!1!1!21qy!shcb)87-!286-!91-!1/6*<!!!!!!!!!!!!nbshjo.cpuupn;!6qy<!!!!!!!!~!!!!!!!!!!!!!!!!/ifbefs!q!|!!!!!!!!!!!!dpmps;!$bbb<!!!!!!!!!!!!gpou.tj{f;!2/2sfn<!!!!!!!!~!!!!!!!!!!!!!!!!/hbnf.jogp!|!!!!!!!!!!!!ejtqmbz;!gmfy<!!!!!!!!!!!!kvtujgz.dpoufou;!tqbdf.cfuxffo<!!!!!!!!!!!!xjeui;!211&<!!!!!!!!!!!!cbdlhspvoe.dpmps;!shcb)1-!1-!1-!1/4*<!!!!!!!!!!!!qbeejoh;!26qy!36qy<!!!!!!!!!!!!cpsefs.sbejvt;!21qy<!!!!!!!!!!!!cpsefs;!2qy!tpmje!$444<!!!!!!!!~!!!!!!!!!!!!!!!!/tdpsf.dpoubjofs-!/ijhi.tdpsf.dpoubjofs!|!!!!!!!!!!!!ufyu.bmjho;!dfoufs<!!!!!!!!~!!!!!!!!!!!!!!!!/tdpsf.mbcfm-!/ijhi.tdpsf.mbcfm!|!!!!!!!!!!!!gpou.tj{f;!2sfn<!!!!!!!!!!!!dpmps;!$bbb<!!!!!!!!~!!!!!!!!!!!!!!!!/tdpsf-!/ijhi.tdpsf!|!!!!!!!!!!!!gpou.tj{f;!3/3sfn<!!!!!!!!!!!!gpou.xfjhiu;!cpme<!!!!!!!!!!!!dpmps;!$GGD218<!!!!!!!!~!!!!!!!!!!!!!!!!/hbnf.xsbqqfs!|!!!!!!!!!!!!ejtqmbz;!gmfy<!!!!!!!!!!!!gmfy.xsbq;!xsbq<!!!!!!!!!!!!kvtujgz.dpoufou;!dfoufs<!!!!!!!!!!!!hbq;!41qy<!!!!!!!!!!!!xjeui;!211&<!!!!!!!!~!!!!!!!!!!!!!!!!/hbnf.cpbse.dpoubjofs!|!!!!!!!!!!!!qptjujpo;!sfmbujwf<!!!!!!!!~!!!!!!!!!!!!!!!!$hbnf.cpbse!|!!!!!!!!!!!!cpsefs;!4qy!tpmje!$444<!!!!!!!!!!!!cpsefs.sbejvt;!6qy<!!!!!!!!!!!!cbdlhspvoe.dpmps;!$222<!!!!!!!!!!!!cpy.tibepx;!1!1!31qy!shcb)1-!1-!1-!1/8*<!!!!!!!!~!!!!!!!!!!!!!!!!/dpouspmt!|!!!!!!!!!!!!ejtqmbz;!gmfy<!!!!!!!!!!!!gmfy.ejsfdujpo;!dpmvno<!!!!!!!!!!!!kvtujgz.dpoufou;!dfoufs<!!!!!!!!!!!!hbq;!31qy<!!!!!!!!!!!!gmfy;!2<!!!!!!!!!!!!njo.xjeui;!361qy<!!!!!!!!~!!!!!!!!!!!!!!!!/jotusvdujpot!|!!!!!!!!!!!!cbdlhspvoe.dpmps;!shcb)1-!1-!1-!1/4*<!!!!!!!!!!!!qbeejoh;!31qy<!!!!!!!!!!!!cpsefs.sbejvt;!21qy<!!!!!!!!!!!!cpsefs;!2qy!tpmje!$444<!!!!!!!!~!!!!!!!!!!!!!!!!/jotusvdujpot!i4!|!!!!!!!!!!!!dpmps;!$5DBG61<!!!!!!!!!!!!nbshjo.cpuupn;!21qy<!!!!!!!!!!!!gpou.tj{f;!2/5sfn<!!!!!!!!~!!!!!!!!!!!!!!!!/jotusvdujpot!vm!|!!!!!!!!!!!!qbeejoh.mfgu;!31qy<!!!!!!!!!!!!dpmps;!$ddd<!!!!!!!!!!!!mjof.ifjhiu;!2/7<!!!!!!!!~!!!!!!!!!!!!!!!!/jotusvdujpot!mj!|!!!!!!!!!!!!nbshjo.cpuupn;!9qy<!!!!!!!!~!!!!!!!!!!!!!!!!/cvuupot!|!!!!!!!!!!!!ejtqmbz;!gmfy<!!!!!!!!!!!!gmfy.ejsfdujpo;!dpmvno<!!!!!!!!!!!!hbq;!23qy<!!!!!!!!~!!!!!!!!!!!!!!!!cvuupo!|!!!!!!!!!!!!qbeejoh;!26qy<!!!!!!!!!!!!gpou.tj{f;!2/2sfn<!!!!!!!!!!!!gpou.xfjhiu;!cpme<!!!!!!!!!!!!cpsefs;!opof<!!!!!!!!!!!!cpsefs.sbejvt;!9qy<!!!!!!!!!!!!dvstps;!qpjoufs<!!!!!!!!!!!!usbotjujpo;!bmm!1/4t<!!!!!!!!~!!!!!!!!!!!!!!!!$tubsu.cuo!|!!!!!!!!!!!!cbdlhspvoe.dpmps;!$5DBG61<!!!!!!!!!!!!dpmps;!xijuf<!!!!!!!!~!!!!!!!!!!!!!!!!$tubsu.cuo;ipwfs!|!!!!!!!!!!!!cbdlhspvoe.dpmps;!$4e9c51<!!!!!!!!!!!!usbotgpsn;!usbotmbufZ).3qy*<!!!!!!!!~!!!!!!!!!!!!!!!!$sftfu.cuo!|!!!!!!!!!!!!cbdlhspvoe.dpmps;!$g55447<!!!!!!!!!!!!dpmps;!xijuf<!!!!!!!!~!!!!!!!!!!!!!!!!$sftfu.cuo;ipwfs!|!!!!!!!!!!!!cbdlhspvoe.dpmps;!$e43g3g<!!!!!!!!!!!!usbotgpsn;!usbotmbufZ).3qy*<!!!!!!!!~!!!!!!!!!!!!!!!!$qbvtf.cuo!|!!!!!!!!!!!!cbdlhspvoe.dpmps;!$32:7G4<!!!!!!!!!!!!dpmps;!xijuf<!!!!!!!!~!!!!!!!!!!!!!!!!$qbvtf.cuo;ipwfs!|!!!!!!!!!!!!cbdlhspvoe.dpmps;!$1c8eeb<!!!!!!!!!!!!usbotgpsn;!usbotmbufZ).3qy*<!!!!!!!!~!!!!!!!!!!!!!!!!/hbnf.tubuvt!|!!!!!!!!!!!!gpou.tj{f;!2/3sfn<!!!!!!!!!!!!ufyu.bmjho;!dfoufs<!!!!!!!!!!!!qbeejoh;!21qy<!!!!!!!!!!!!cbdlhspvoe.dpmps;!shcb)1-!1-!1-!1/6*<!!!!!!!!!!!!cpsefs.sbejvt;!9qy<!!!!!!!!!!!!nbshjo.upq;!21qy<!!!!!!!!!!!!njo.ifjhiu;!61qy<!!!!!!!!!!!!ejtqmbz;!gmfy<!!!!!!!!!!!!bmjho.jufnt;!dfoufs<!!!!!!!!!!!!kvtujgz.dpoufou;!dfoufs<!!!!!!!!~!!!!!!!!!!!!!!!!/npcjmf.dpouspmt!|!!!!!!!!!!!!ejtqmbz;!opof<!!!!!!!!!!!!hsje.ufnqmbuf.dpmvnot;!sfqfbu)4-!2gs*<!!!!!!!!!!!!hsje.ufnqmbuf.spxt;!sfqfbu)3-!2gs*<!!!!!!!!!!!!hbq;!21qy<!!!!!!!!!!!!nbshjo.upq;!31qy<!!!!!!!!!!!!nby.xjeui;!361qy<!!!!!!!!~!!!!!!!!!!!!!!!!/npcjmf.dpouspmt!cvuupo!|!!!!!!!!!!!!qbeejoh;!31qy<!!!!!!!!!!!!gpou.tj{f;!2/6sfn<!!!!!!!!~!!!!!!!!!!!!!!!!/vq.cuo!|!!!!!!!!!!!!hsje.dpmvno;!3<!!!!!!!!!!!!hsje.spx;!2<!!!!!!!!~!!!!!!!!!!!!!!!!/mfgu.cuo!|!!!!!!!!!!!!hsje.dpmvno;!2<!!!!!!!!!!!!hsje.spx;!3<!!!!!!!!~!!!!!!!!!!!!!!!!/epxo.cuo!|!!!!!!!!!!!!hsje.dpmvno;!3<!!!!!!!!!!!!hsje.spx;!3<!!!!!!!!~!!!!!!!!!!!!!!!!/sjhiu.cuo!|!!!!!!!!!!!!hsje.dpmvno;!4<!!!!!!!!!!!!hsje.spx;!3<!!!!!!!!~!!!!!!!!!!!!!!!!Anfejb!)nby.xjeui;!879qy*!|!!!!!!!!!!!!/hbnf.xsbqqfs!|!!!!!!!!!!!!!!!!gmfy.ejsfdujpo;!dpmvno<!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!!!!!!!/npcjmf.dpouspmt!|!!!!!!!!!!!!!!!!ejtqmbz;!hsje<!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!!!!!!!$hbnf.cpbse!|!!!!!!!!!!!!!!!!xjeui;!211&<!!!!!!!!!!!!!!!!nby.xjeui;!511qy<!!!!!!!!!!!!!!!!ifjhiu;!bvup<!!!!!!!!!!!!~!!!!!!!!~!!!!!!!!!!!!!!!!Anfejb!)nby.xjeui;!591qy*!|!!!!!!!!!!!!/ifbefs!i2!|!!!!!!!!!!!!!!!!gpou.tj{f;!3/3sfn<!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!!!!!!!/hbnf.jogp!|!!!!!!!!!!!!!!!!gmfy.ejsfdujpo;!dpmvno<!!!!!!!!!!!!!!!!hbq;!26qy<!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!!!!!!!/tdpsf-!/ijhi.tdpsf!|!!!!!!!!!!!!!!!!gpou.tj{f;!2/9sfn<!!!!!!!!!!!!~!!!!!!!!~!!!!=0tuzmf?=0ifbe?=cpez?!!!!=ejw!dmbtt>#hbnf.dpoubjofs#?!!!!!!!!=ejw!dmbtt>#ifbefs#?!!!!!!!!!!!!=i2?јѝіњћё!)ѿ҃!Ju{Lpotu*=0i2?!!!!!!!!!!!!=q?ћѼѱ҂҂ѹ҈Ѷ҂ѻѱҐ!ѹѴҁѱ!Ѿѱ!KbwbTdsjqu!҂!ѸѱѻҁҌ҃Ҍѽ!ѹ҂҆ѿѵѾҌѽ!ѻѿѵѿѽ/=0q?!!!!!!!!=0ejw?!!!!!!!!!!!!!!!!=ejw!dmbtt>#hbnf.jogp#?!!!!!!!!!!!!=ejw!dmbtt>#tdpsf.dpoubjofs#?!!!!!!!!!!!!!!!!=ejw!dmbtt>#tdpsf.mbcfm#?ѢѨіѣ=0ejw?!!!!!!!!!!!!!!!!=ejw!dmbtt>#tdpsf#!je>#tdpsf#?1=0ejw?!!!!!!!!!!!!=0ejw?!!!!!!!!!!!!=ejw!dmbtt>#ijhi.tdpsf.dpoubjofs#?!!!!!!!!!!!!!!!!=ejw!dmbtt>#ijhi.tdpsf.mbcfm#?ѡіћџѡѕ=0ejw?!!!!!!!!!!!!!!!!=ejw!dmbtt>#ijhi.tdpsf#!je>#ijhi.tdpsf#?1=0ejw?!!!!!!!!!!!!=0ejw?!!!!!!!!=0ejw?!!!!!!!!!!!!!!!!=ejw!dmbtt>#hbnf.xsbqqfs#?!!!!!!!!!!!!=ejw!dmbtt>#hbnf.cpbse.dpoubjofs#?!!!!!!!!!!!!!!!!=dbowbt!je>#hbnf.cpbse#!xjeui>#611#!ifjhiu>#611#?=0dbowbt?!!!!!!!!!!!!!!!!=ejw!dmbtt>#hbnf.tubuvt#!je>#hbnf.tubuvt#?ўѱѷѽѹ҃Ѷ!#Ѣѣёѡѣ#-!҈҃ѿѲҌ!Ѿѱ҈ѱ҃ҍ!ѹѴҁ҄=0ejw?!!!!!!!!!!!!=0ejw?!!!!!!!!!!!!!!!!!!!!!!!!=ejw!dmbtt>#dpouspmt#?!!!!!!!!!!!!!!!!=ejw!dmbtt>#jotusvdujpot#?!!!!!!!!!!!!!!!!!!!!=i4?Ѥ�ҁѱѳѼѶѾѹѶ!ѹѴҁѿѺ=0i4?!!!!!!!!!!!!!!!!!!!!=vm?!!!!!!!!!!!!!!!!!!!!!!!!=mj?љ҂�ѿѼҍѸ҄Ѻ҃Ѷ!=tuspoh?҂҃ҁѶѼѻѹ!Ѿѱ!ѻѼѱѳѹѱ҃҄ҁѶ=0tuspoh?!ѵѼҐ!҄�ҁѱѳѼѶѾѹҐ!ѸѽѶѺѻѿѺ=0mj?!!!!!!!!!!!!!!!!!!!!!!!!=mj?ѢѿѲѹҁѱѺ҃Ѷ!=tqbo!tuzmf>#dpmps;$GGD218#?ѷѶѼ҃҄ҏ!Ѷѵ҄=0tqbo?-!҈҃ѿѲҌ!҄ѳѶѼѹ҈ѹ҃ҍ!҂҈Ѷ҃=0mj?!!!!!!!!!!!!!!!!!!!!!!!!=mj?љѸѲѶѴѱѺ҃Ѷ!҂҃ѿѼѻѾѿѳѶѾѹѺ!҂ѿ!҂҃ѶѾѱѽѹ!ѹ!҂!҂ѿѲ҂҃ѳѶѾѾҌѽ!҆ѳѿ҂҃ѿѽ=0mj?!!!!!!!!!!!!!!!!!!!!!!!!=mj?ћѱѷѵѱҐ!҂ҋѶѵѶѾѾѱҐ!Ѷѵѱ!҄ѳѶѼѹ҈ѹѳѱѶ҃!ѵѼѹѾ҄!ѸѽѶѺѻѹ=0mj?!!!!!!!!!!!!!!!!!!!!!!!!=mj?ѧѶѼҍ;!ѾѱѲҁѱ҃ҍ!ѻѱѻ!ѽѿѷѾѿ!ѲѿѼҍ҉Ѷ!ѿ҈ѻѿѳ=0mj?!!!!!!!!!!!!!!!!!!!!=0vm?!!!!!!!!!!!!!!!!=0ejw?!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!=ejw!dmbtt>#cvuupot#?!!!!!!!!!!!!!!!!!!!!=cvuupo!je>#tubsu.cuo#?Ѣѣёѡѣ=0cvuupo?!!!!!!!!!!!!!!!!!!!!=cvuupo!je>#qbvtf.cuo#?ѠёѤјё=0cvuupo?!!!!!!!!!!!!!!!!!!!!=cvuupo!je>#sftfu.cuo#?ѢђѡџѢ=0cvuupo?!!!!!!!!!!!!!!!!=0ejw?!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!=ejw!dmbtt>#npcjmf.dpouspmt#?!!!!!!!!!!!!!!!!!!!!=cvuupo!dmbtt>#vq.cuo#!je>#vq.cuo#?㇒=0cvuupo?!!!!!!!!!!!!!!!!!!!!=cvuupo!dmbtt>#mfgu.cuo#!je>#mfgu.cuo#?㇑=0cvuupo?!!!!!!!!!!!!!!!!!!!!=cvuupo!dmbtt>#epxo.cuo#!je>#epxo.cuo#?㇔=0cvuupo?!!!!!!!!!!!!!!!!!!!!=cvuupo!dmbtt>#sjhiu.cuo#!je>#sjhiu.cuo#?㇓=0cvuupo?!!!!!!!!!!!!!!!!=0ejw?!!!!!!!!!!!!=0ejw?!!!!!!!!=0ejw?!!!!=0ejw?!!!!=tdsjqu?!!!!!!!!00!љѾѹ҇ѹѱѼѹѸѱ҇ѹҐ!ҎѼѶѽѶѾ҃ѿѳ!!!!!!!!dpotu!dbowbt!>!epdvnfou/hfuFmfnfouCzJe)(hbnf.cpbse(*<!!!!!!!!dpotu!duy!>!dbowbt/hfuDpoufyu)(3e(*<!!!!!!!!dpotu!tdpsfFmfnfou!>!epdvnfou/hfuFmfnfouCzJe)(tdpsf(*<!!!!!!!!dpotu!ijhiTdpsfFmfnfou!>!epdvnfou/hfuFmfnfouCzJe)(ijhi.tdpsf(*<!!!!!!!!dpotu!hbnfTubuvtFmfnfou!>!epdvnfou/hfuFmfnfouCzJe)(hbnf.tubuvt(*<!!!!!!!!dpotu!tubsuCvuupo!>!epdvnfou/hfuFmfnfouCzJe)(tubsu.cuo(*<!!!!!!!!dpotu!qbvtfCvuupo!>!epdvnfou/hfuFmfnfouCzJe)(qbvtf.cuo(*<!!!!!!!!dpotu!sftfuCvuupo!>!epdvnfou/hfuFmfnfouCzJe)(sftfu.cuo(*<!!!!!!!!!!!!!!!!00!ѝѿѲѹѼҍѾҌѶ!ѻѾѿ�ѻѹ!҄�ҁѱѳѼѶѾѹҐ!!!!!!!!dpotu!vqCvuupo!>!epdvnfou/hfuFmfnfouCzJe)(vq.cuo(*<!!!!!!!!dpotu!epxoCvuupo!>!epdvnfou/hfuFmfnfouCzJe)(epxo.cuo(*<!!!!!!!!dpotu!mfguCvuupo!>!epdvnfou/hfuFmfnfouCzJe)(mfgu.cuo(*<!!!!!!!!dpotu!sjhiuCvuupo!>!epdvnfou/hfuFmfnfouCzJe)(sjhiu.cuo(*<!!!!!!!!!!!!!!!!00!ѠѱҁѱѽѶ҃ҁҌ!ѹѴҁҌ!!!!!!!!dpotu!hsjeTj{f!>!31<!00!ѡѱѸѽѶҁ!ѿѵѾѿѺ!ѻѼѶ҃ѻѹ!!!!!!!!dpotu!hsjeXjeui!>!dbowbt/xjeui!0!hsjeTj{f<!!!!!!!!dpotu!hsjeIfjhiu!>!dbowbt/ifjhiu!0!hsjeTj{f<!!!!!!!!!!!!!!!!mfu!toblf!>!\\^<!!!!!!!!mfu!gppe!>!|~<!!!!!!!!mfu!ejsfdujpo!>!(sjhiu(<!!!!!!!!mfu!ofyuEjsfdujpo!>!(sjhiu(<!!!!!!!!mfu!hbnfTqffe!>!231<!00!Ѣѻѿҁѿ҂҃ҍ!ѹѴҁҌ!)ѽѶѾҍ҉Ѷ!>!ѲҌ҂҃ҁѶѶ*!!!!!!!!mfu!hbnfJoufswbm<!!!!!!!!mfu!tdpsf!>!1<!!!!!!!!mfu!ijhiTdpsf!>!mpdbmTupsbhf/hfuJufn)(toblfIjhiTdpsf(*!}}!1<!!!!!!!!mfu!hbnfSvoojoh!>!gbmtf<!!!!!!!!mfu!hbnfQbvtfe!>!gbmtf<!!!!!!!!!!!!!!!!00!Ѥ҂҃ѱѾѿѳѻѱ!ҁѶѻѿҁѵѱ!!!!!!!!ijhiTdpsfFmfnfou/ufyuDpoufou!>!ijhiTdpsf<!!!!!!!!!!!!!!!!00!љѾѹ҇ѹѱѼѹѸѱ҇ѹҐ!ѹѴҁҌ!!!!!!!!gvodujpo!jojuHbnf)*!|!!!!!!!!!!!!00!ўѱ҈ѱѼҍѾѱҐ!�ѿѸѹ҇ѹҐ!ѸѽѶѺѻѹ!!!!!!!!!!!!toblf!>!\\!!!!!!!!!!!!!!!!|y;!6-!z;!21~-!!!!!!!!!!!!!!!!|y;!5-!z;!21~-!!!!!!!!!!!!!!!!|y;!4-!z;!21~!!!!!!!!!!!!^<!!!!!!!!!!!!!!!!!!!!!!!!00!ўѱ҈ѱѼҍѾѿѶ!Ѿѱ�ҁѱѳѼѶѾѹѶ!!!!!!!!!!!!ejsfdujpo!>!(sjhiu(<!!!!!!!!!!!!ofyuEjsfdujpo!>!(sjhiu(<!!!!!!!!!!!!!!!!!!!!!!!!00!ѢѿѸѵѱѾѹѶ!�ѶҁѳѿѺ!ѶѵҌ!!!!!!!!!!!!hfofsbufGppe)*<!!!!!!!!!!!!!!!!!!!!!!!!00!ѢѲҁѿ҂!҂҈Ѷ҃ѱ!!!!!!!!!!!!tdpsf!>!1<!!!!!!!!!!!!tdpsfFmfnfou/ufyuDpoufou!>!tdpsf<!!!!!!!!!!!!!!!!!!!!!!!!00!џѲѾѿѳѼѶѾѹѶ!҂҃ѱ҃҄҂ѱ!!!!!!!!!!!!hbnfTubuvtFmfnfou/ufyuDpoufou!>!(љѴҁѱ!Ѿѱ҈ѱѼѱ҂ҍ\"!Ѥ�ҁѱѳѼҐѺ҃Ѷ!ѸѽѶѺѻѿѺ!҂!�ѿѽѿҊҍҏ!҂҃ҁѶѼѿѻ(<!!!!!!!!!!!!hbnfTubuvtFmfnfou/tuzmf/dpmps!>!($5DBG61(<!!!!!!!!~!!!!!!!!!!!!!!!!00!єѶѾѶҁѱ҇ѹҐ!ѶѵҌ!!!!!!!!gvodujpo!hfofsbufGppe)*!|!!!!!!!!!!!!mfu!gppePoToblf<!!!!!!!!!!!!!!!!!!!!!!!!ep!|!!!!!!!!!!!!!!!!gppePoToblf!>!gbmtf<!!!!!!!!!!!!!!!!gppe!>!|!!!!!!!!!!!!!!!!!!!!y;!Nbui/gmpps)Nbui/sboepn)*!+!hsjeXjeui*-!!!!!!!!!!!!!!!!!!!!z;!Nbui/gmpps)Nbui/sboepn)*!+!hsjeIfjhiu*!!!!!!!!!!!!!!!!~<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!00!ѠҁѿѳѶҁҐѶѽ-!ѾѶ!�ѿҐѳѹѼѱ҂ҍ!Ѽѹ!Ѷѵѱ!Ѿѱ!ѸѽѶѺѻѶ!!!!!!!!!!!!!!!!gps!)mfu!tfhnfou!pg!toblf*!|!!!!!!!!!!!!!!!!!!!!jg!)tfhnfou/y!>>>!gppe/y!\'\'!tfhnfou/z!>>>!gppe/z*!|!!!!!!!!!!!!!!!!!!!!!!!!gppePoToblf!>!usvf<!!!!!!!!!!!!!!!!!!!!!!!!csfbl<!!!!!!!!!!!!!!!!!!!!~!!!!!!!!!!!!!!!!~!!!!!!!!!!!!~!xijmf!)gppePoToblf*<!!!!!!!!~!!!!!!!!!!!!!!!!00!џ҃ҁѹ҂ѿѳѻѱ!ѹѴҁҌ!!!!!!!!gvodujpo!esbxHbnf)*!|!!!!!!!!!!!!00!џ҈ѹ҂҃ѻѱ!҆ѿѼ҂҃ѱ!!!!!!!!!!!!duy/gjmmTuzmf!>!($222(<!!!!!!!!!!!!duy/gjmmSfdu)1-!1-!dbowbt/xjeui-!dbowbt/ifjhiu*<!!!!!!!!!!!!!!!!!!!!!!!!00!џ҃ҁѹ҂ѿѳѻѱ!҂Ѷ҃ѻѹ!!!!!!!!!!!!duy/tusplfTuzmf!>!($333(<!!!!!!!!!!!!duy/mjofXjeui!>!1/6<!!!!!!!!!!!!!!!!!!!!!!!!gps!)mfu!y!>!1<!y!=!hsjeXjeui<!y,,*!|!!!!!!!!!!!!!!!!gps!)mfu!z!>!1<!z!=!hsjeIfjhiu<!z,,*!|!!!!!!!!!!!!!!!!!!!!duy/tusplfSfdu)y!+!hsjeTj{f-!z!+!hsjeTj{f-!hsjeTj{f-!hsjeTj{f*<!!!!!!!!!!!!!!!!~!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!!!!!!!00!џ҃ҁѹ҂ѿѳѻѱ!ѸѽѶѺѻѹ!!!!!!!!!!!!toblf/gpsFbdi))tfhnfou-!joefy*!>?!|!!!!!!!!!!!!!!!!00!єѿѼѿѳѱ!ѸѽѶѺѻѹ!!!!!!!!!!!!!!!!jg!)joefy!>>>!1*!|!!!!!!!!!!!!!!!!!!!!duy/gjmmTuzmf!>!($5DBG61(<!!!!!!!!!!!!!!!!!!!!duy/gjmmSfdu)tfhnfou/y!+!hsjeTj{f-!tfhnfou/z!+!hsjeTj{f-!hsjeTj{f-!hsjeTj{f*<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!00!єѼѱѸѱ!ѸѽѶѺѻѹ!!!!!!!!!!!!!!!!!!!!duy/gjmmTuzmf!>!($111(<!!!!!!!!!!!!!!!!!!!!mfu!fzfTj{f!>!hsjeTj{f!0!6<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!00!ѠѿѸѹ҇ѹҐ!ѴѼѱѸ!ѳ!Ѹѱѳѹ҂ѹѽѿ҂҃ѹ!ѿ҃!Ѿѱ�ҁѱѳѼѶѾѹҐ!!!!!!!!!!!!!!!!!!!!mfu!mfguFzfY-!mfguFzfZ-!sjhiuFzfY-!sjhiuFzfZ<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!txjudi)ejsfdujpo*!|!!!!!!!!!!!!!!!!!!!!!!!!dbtf!(sjhiu(;!!!!!!!!!!!!!!!!!!!!!!!!!!!!mfguFzfY!>!tfhnfou/y!+!hsjeTj{f!,!hsjeTj{f!.!fzfTj{f+3<!!!!!!!!!!!!!!!!!!!!!!!!!!!!mfguFzfZ!>!tfhnfou/z!+!hsjeTj{f!,!fzfTj{f+3<!!!!!!!!!!!!!!!!!!!!!!!!!!!!sjhiuFzfY!>!tfhnfou/y!+!hsjeTj{f!,!hsjeTj{f!.!fzfTj{f+3<!!!!!!!!!!!!!!!!!!!!!!!!!!!!sjhiuFzfZ!>!tfhnfou/z!+!hsjeTj{f!,!hsjeTj{f!.!fzfTj{f+4<!!!!!!!!!!!!!!!!!!!!!!!!!!!!csfbl<!!!!!!!!!!!!!!!!!!!!!!!!dbtf!(mfgu(;!!!!!!!!!!!!!!!!!!!!!!!!!!!!mfguFzfY!>!tfhnfou/y!+!hsjeTj{f!,!fzfTj{f<!!!!!!!!!!!!!!!!!!!!!!!!!!!!mfguFzfZ!>!tfhnfou/z!+!hsjeTj{f!,!fzfTj{f+3<!!!!!!!!!!!!!!!!!!!!!!!!!!!!sjhiuFzfY!>!tfhnfou/y!+!hsjeTj{f!,!fzfTj{f<!!!!!!!!!!!!!!!!!!!!!!!!!!!!sjhiuFzfZ!>!tfhnfou/z!+!hsjeTj{f!,!hsjeTj{f!.!fzfTj{f+4<!!!!!!!!!!!!!!!!!!!!!!!!!!!!csfbl<!!!!!!!!!!!!!!!!!!!!!!!!dbtf!(vq(;!!!!!!!!!!!!!!!!!!!!!!!!!!!!mfguFzfY!>!tfhnfou/y!+!hsjeTj{f!,!fzfTj{f+3<!!!!!!!!!!!!!!!!!!!!!!!!!!!!mfguFzfZ!>!tfhnfou/z!+!hsjeTj{f!,!fzfTj{f<!!!!!!!!!!!!!!!!!!!!!!!!!!!!sjhiuFzfY!>!tfhnfou/y!+!hsjeTj{f!,!hsjeTj{f!.!fzfTj{f+4<!!!!!!!!!!!!!!!!!!!!!!!!!!!!sjhiuFzfZ!>!tfhnfou/z!+!hsjeTj{f!,!fzfTj{f<!!!!!!!!!!!!!!!!!!!!!!!!!!!!csfbl<!!!!!!!!!!!!!!!!!!!!!!!!dbtf!(epxo(;!!!!!!!!!!!!!!!!!!!!!!!!!!!!mfguFzfY!>!tfhnfou/y!+!hsjeTj{f!,!fzfTj{f+3<!!!!!!!!!!!!!!!!!!!!!!!!!!!!mfguFzfZ!>!tfhnfou/z!+!hsjeTj{f!,!hsjeTj{f!.!fzfTj{f+3<!!!!!!!!!!!!!!!!!!!!!!!!!!!!sjhiuFzfY!>!tfhnfou/y!+!hsjeTj{f!,!hsjeTj{f!.!fzfTj{f+4<!!!!!!!!!!!!!!!!!!!!!!!!!!!!sjhiuFzfZ!>!tfhnfou/z!+!hsjeTj{f!,!hsjeTj{f!.!fzfTj{f+3<!!!!!!!!!!!!!!!!!!!!!!!!!!!!csfbl<!!!!!!!!!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!duy/gjmmSfdu)mfguFzfY-!mfguFzfZ-!fzfTj{f-!fzfTj{f*<!!!!!!!!!!!!!!!!!!!!duy/gjmmSfdu)sjhiuFzfY-!sjhiuFzfZ-!fzfTj{f-!fzfTj{f*<!!!!!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!00!ѣѶѼѿ!ѸѽѶѺѻѹ!!!!!!!!!!!!!!!!fmtf!|!!!!!!!!!!!!!!!!!!!!duy/gjmmTuzmf!>!($9CD45B(<!!!!!!!!!!!!!!!!!!!!duy/gjmmSfdu)tfhnfou/y!+!hsjeTj{f-!tfhnfou/z!+!hsjeTj{f-!hsjeTj{f-!hsjeTj{f*<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!00!ќѶѴѻѹѺ!ѴҁѱѵѹѶѾ҃!ѵѼҐ!҃ѶѼѱ!!!!!!!!!!!!!!!!!!!!duy/gjmmTuzmf!>!($8DC453(<!!!!!!!!!!!!!!!!!!!!duy/gjmmSfdu)tfhnfou/y!+!hsjeTj{f!,!3-!tfhnfou/z!+!hsjeTj{f!,!3-!hsjeTj{f!.!5-!hsjeTj{f!.!5*<!!!!!!!!!!!!!!!!~!!!!!!!!!!!!~*<!!!!!!!!!!!!!!!!!!!!!!!!00!џ҃ҁѹ҂ѿѳѻѱ!ѶѵҌ!!!!!!!!!!!!duy/gjmmTuzmf!>!($GGD218(<!!!!!!!!!!!!duy/cfhjoQbui)*<!!!!!!!!!!!!duy/bsd)!!!!!!!!!!!!!!!!gppe/y!+!hsjeTj{f!,!hsjeTj{f03-!!!!!!!!!!!!!!!!gppe/z!+!hsjeTj{f!,!hsjeTj{f03-!!!!!!!!!!!!!!!!hsjeTj{f03!.!3-!!!!!!!!!!!!!!!!1-!!!!!!!!!!!!!!!!Nbui/QJ!+!3!!!!!!!!!!!!*<!!!!!!!!!!!!duy/gjmm)*<!!!!!!!!!!!!!!!!!!!!!!!!00!Ѯ҅҅Ѷѻ҃!҂ѳѶ҈ѶѾѹҐ!ѶѵҌ!!!!!!!!!!!!duy/gjmmTuzmf!>!(shcb)366-!2:4-!8-!1/4*(<!!!!!!!!!!!!duy/cfhjoQbui)*<!!!!!!!!!!!!duy/bsd)!!!!!!!!!!!!!!!!gppe/y!+!hsjeTj{f!,!hsjeTj{f03-!!!!!!!!!!!!!!!!gppe/z!+!hsjeTj{f!,!hsjeTj{f03-!!!!!!!!!!!!!!!!hsjeTj{f03-!!!!!!!!!!!!!!!!1-!!!!!!!!!!!!!!!!Nbui/QJ!+!3!!!!!!!!!!!!*<!!!!!!!!!!!!duy/gjmm)*<!!!!!!!!~!!!!!!!!!!!!!!!!00!џѲѾѿѳѼѶѾѹѶ!҂ѿ҂҃ѿҐѾѹҐ!ѹѴҁҌ!!!!!!!!gvodujpo!vqebufHbnf)*!|!!!!!!!!!!!!00!џѲѾѿѳѼѶѾѹѶ!Ѿѱ�ҁѱѳѼѶѾѹҐ!!!!!!!!!!!!ejsfdujpo!>!ofyuEjsfdujpo<!!!!!!!!!!!!!!!!!!!!!!!!00!ѢѿѸѵѱѾѹѶ!ѾѿѳѿѺ!ѴѿѼѿѳҌ!Ѿѱ!ѿ҂ѾѿѳѶ!҃Ѷѻ҄ҊѶѴѿ!Ѿѱ�ҁѱѳѼѶѾѹҐ!!!!!!!!!!!!dpotu!ifbe!>!|y;!toblf\\1^/y-!z;!toblf\\1^/z~<!!!!!!!!!!!!!!!!!!!!!!!!txjudi)ejsfdujpo*!|!!!!!!!!!!!!!!!!dbtf!(vq(;!!!!!!!!!!!!!!!!!!!!ifbe/z!.>!2<!!!!!!!!!!!!!!!!!!!!csfbl<!!!!!!!!!!!!!!!!dbtf!(epxo(;!!!!!!!!!!!!!!!!!!!!ifbe/z!,>!2<!!!!!!!!!!!!!!!!!!!!csfbl<!!!!!!!!!!!!!!!!dbtf!(mfgu(;!!!!!!!!!!!!!!!!!!!!ifbe/y!.>!2<!!!!!!!!!!!!!!!!!!!!csfbl<!!!!!!!!!!!!!!!!dbtf!(sjhiu(;!!!!!!!!!!!!!!!!!!!!ifbe/y!,>!2<!!!!!!!!!!!!!!!!!!!!csfbl<!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!!!!!!!00!ѠҁѿѳѶҁѻѱ!҂҃ѿѼѻѾѿѳѶѾѹҐ!҂ѿ!҂҃ѶѾѱѽѹ!!!!!!!!!!!!jg!)!!!!!!!!!!!!!!!!ifbe/y!=!1!}}!!!!!!!!!!!!!!!!!ifbe/y!?>!hsjeXjeui!}}!!!!!!!!!!!!!!!!!ifbe/z!=!1!}}!!!!!!!!!!!!!!!!!ifbe/z!?>!hsjeIfjhiu!!!!!!!!!!!!*!|!!!!!!!!!!!!!!!!hbnfPwfs)*<!!!!!!!!!!!!!!!!sfuvso<!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!!!!!!!00!ѠҁѿѳѶҁѻѱ!҂҃ѿѼѻѾѿѳѶѾѹҐ!҂!҂ѿѲ҂҃ѳѶѾѾҌѽ!҃ѶѼѿѽ!!!!!!!!!!!!gps!)mfu!tfhnfou!pg!toblf*!|!!!!!!!!!!!!!!!!jg!)tfhnfou/y!>>>!ifbe/y!\'\'!tfhnfou/z!>>>!ifbe/z*!|!!!!!!!!!!!!!!!!!!!!hbnfPwfs)*<!!!!!!!!!!!!!!!!!!!!sfuvso<!!!!!!!!!!!!!!!!~!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!!!!!!!00!ѕѿѲѱѳѼѶѾѹѶ!ѾѿѳѿѺ!ѴѿѼѿѳҌ!!!!!!!!!!!!toblf/votijgu)ifbe*<!!!!!!!!!!!!!!!!!!!!!!!!00!ѠҁѿѳѶҁѻѱ-!҂ҋѶѼѱ!Ѽѹ!ѸѽѶѺѻѱ!Ѷѵ҄!!!!!!!!!!!!jg!)ifbe/y!>>>!gppe/y!\'\'!ifbe/z!>>>!gppe/z*!|!!!!!!!!!!!!!!!!00!ѤѳѶѼѹ҈ѶѾѹѶ!҂҈Ѷ҃ѱ!!!!!!!!!!!!!!!!tdpsf!,>!21<!!!!!!!!!!!!!!!!tdpsfFmfnfou/ufyuDpoufou!>!tdpsf<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!00!џѲѾѿѳѼѶѾѹѶ!ҁѶѻѿҁѵѱ!!!!!!!!!!!!!!!!jg!)tdpsf!?!ijhiTdpsf*!|!!!!!!!!!!!!!!!!!!!!ijhiTdpsf!>!tdpsf<!!!!!!!!!!!!!!!!!!!!ijhiTdpsfFmfnfou/ufyuDpoufou!>!ijhiTdpsf<!!!!!!!!!!!!!!!!!!!!mpdbmTupsbhf/tfuJufn)(toblfIjhiTdpsf(-!ijhiTdpsf*<!!!!!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!00!єѶѾѶҁѱ҇ѹҐ!ѾѿѳѿѺ!ѶѵҌ!!!!!!!!!!!!!!!!hfofsbufGppe)*<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!00!ѤѳѶѼѹ҈ѶѾѹѶ!҂ѻѿҁѿ҂҃ѹ!ѹѴҁҌ!ѻѱѷѵҌѶ!61!ѿ҈ѻѿѳ!!!!!!!!!!!!!!!!jg!)tdpsf!&!61!>>>!1!\'\'!hbnfTqffe!?!61*!|!!!!!!!!!!!!!!!!!!!!hbnfTqffe!.>!6<!!!!!!!!!!!!!!!!!!!!dmfbsJoufswbm)hbnfJoufswbm*<!!!!!!!!!!!!!!!!!!!!hbnfJoufswbm!>!tfuJoufswbm)vqebufHbnf-!hbnfTqffe*<!!!!!!!!!!!!!!!!~!!!!!!!!!!!!~!fmtf!|!!!!!!!!!!!!!!!!00!ѤѵѱѼѶѾѹѶ!҆ѳѿ҂҃ѱ-!Ѷ҂Ѽѹ!Ѷѵѱ!ѾѶ!҂ҋѶѵѶѾѱ!!!!!!!!!!!!!!!!toblf/qpq)*<!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!!!!!!!00!џ҃ҁѹ҂ѿѳѻѱ!ѿѲѾѿѳѼѶѾѾѿѺ!ѹѴҁҌ!!!!!!!!!!!!esbxHbnf)*<!!!!!!!!~!!!!!!!!!!!!!!!!00!џѲҁѱѲѿ҃ѻѱ!ѿѻѿѾ҈ѱѾѹҐ!ѹѴҁҌ!!!!!!!!gvodujpo!hbnfPwfs)*!|!!!!!!!!!!!!hbnfSvoojoh!>!gbmtf<!!!!!!!!!!!!dmfbsJoufswbm)hbnfJoufswbm*<!!!!!!!!!!!!!!!!!!!!!!!!hbnfTubuvtFmfnfou/ufyuDpoufou!>!aљѴҁѱ!ѿѻѿѾ҈ѶѾѱ\"!ѓѱ҉!҂҈Ѷ҃;!%|tdpsf~/!ўѱѷѽѹ҃Ѷ!#ѢђѡџѢ#-!҈҃ѿѲҌ!Ѿѱ҈ѱ҃ҍ!ѸѱѾѿѳѿa<!!!!!!!!!!!!hbnfTubuvtFmfnfou/tuzmf/dpmps!>!($g55447(<!!!!!!!!~!!!!!!!!!!!!!!!!00!џѲҁѱѲѿ҃ѻѱ!Ѿѱѷѱ҃ѹѺ!ѻѼѱѳѹ҉!!!!!!!!gvodujpo!iboemfLfzEpxo)fwfou*!|!!!!!!!!!!!!00!љѴѾѿҁѹҁ҄Ѷѽ!Ѿѱѷѱ҃ѹҐ-!Ѷ҂Ѽѹ!ѹѴҁѱ!ѾѶ!Ѹѱ�҄ҊѶѾѱ!ѹѼѹ!Ѿѱ!�ѱ҄ѸѶ!!!!!!!!!!!!jg!)\"hbnfSvoojoh!}}!hbnfQbvtfe*!sfuvso<!!!!!!!!!!!!!!!!!!!!!!!!txjudi)fwfou/lfz*!|!!!!!!!!!!!!!!!!dbtf!(BsspxVq(;!!!!!!!!!!!!!!!!!!!!jg!)ejsfdujpo!\">>!(epxo(*!ofyuEjsfdujpo!>!(vq(<!!!!!!!!!!!!!!!!!!!!csfbl<!!!!!!!!!!!!!!!!dbtf!(BsspxEpxo(;!!!!!!!!!!!!!!!!!!!!jg!)ejsfdujpo!\">>!(vq(*!ofyuEjsfdujpo!>!(epxo(<!!!!!!!!!!!!!!!!!!!!csfbl<!!!!!!!!!!!!!!!!dbtf!(BsspxMfgu(;!!!!!!!!!!!!!!!!!!!!jg!)ejsfdujpo!\">>!(sjhiu(*!ofyuEjsfdujpo!>!(mfgu(<!!!!!!!!!!!!!!!!!!!!csfbl<!!!!!!!!!!!!!!!!dbtf!(BsspxSjhiu(;!!!!!!!!!!!!!!!!!!!!jg!)ejsfdujpo!\">>!(mfgu(*!ofyuEjsfdujpo!>!(sjhiu(<!!!!!!!!!!!!!!!!!!!!csfbl<!!!!!!!!!!!!!!!!dbtf!(!(;!!!!!!!!!!!!!!!!!!!!00!ѠҁѿѲѶѼ!ѵѼҐ!�ѱ҄ѸҌ!!!!!!!!!!!!!!!!!!!!uphhmfQbvtf)*<!!!!!!!!!!!!!!!!!!!!csfbl<!!!!!!!!!!!!~!!!!!!!!~!!!!!!!!!!!!!!!!00!јѱ�҄҂ѻ!ѹѴҁҌ!!!!!!!!gvodujpo!tubsuHbnf)*!|!!!!!!!!!!!!jg!)hbnfSvoojoh*!sfuvso<!!!!!!!!!!!!!!!!!!!!!!!!jg!)\"hbnfQbvtfe*!|!!!!!!!!!!!!!!!!jojuHbnf)*<!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!!!!!!!hbnfSvoojoh!>!usvf<!!!!!!!!!!!!hbnfQbvtfe!>!gbmtf<!!!!!!!!!!!!hbnfJoufswbm!>!tfuJoufswbm)vqebufHbnf-!hbnfTqffe*<!!!!!!!!!!!!!!!!!!!!!!!!tubsuCvuupo/ufyuDpoufou!>!(Ѣѣёѡѣ(<!!!!!!!!!!!!qbvtfCvuupo/ufyuDpoufou!>!(ѠёѤјё(<!!!!!!!!!!!!hbnfTubuvtFmfnfou/ufyuDpoufou!>!(љѴҁѱ!ѹѵѶ҃///!Ѥ�ҁѱѳѼҐѺ҃Ѷ!ѸѽѶѺѻѿѺ!҂!�ѿѽѿҊҍҏ!҂҃ҁѶѼѿѻ(<!!!!!!!!!!!!hbnfTubuvtFmfnfou/tuzmf/dpmps!>!($5DBG61(<!!!!!!!!~!!!!!!!!!!!!!!!!00!Ѡѱ҄Ѹѱ0ѳѿѸѿѲѾѿѳѼѶѾѹѶ!ѹѴҁҌ!!!!!!!!gvodujpo!uphhmfQbvtf)*!|!!!!!!!!!!!!jg!)\"hbnfSvoojoh*!sfuvso<!!!!!!!!!!!!!!!!!!!!!!!!hbnfQbvtfe!>!\"hbnfQbvtfe<!!!!!!!!!!!!!!!!!!!!!!!!jg!)hbnfQbvtfe*!|!!!!!!!!!!!!!!!!dmfbsJoufswbm)hbnfJoufswbm*<!!!!!!!!!!!!!!!!qbvtfCvuupo/ufyuDpoufou!>!(Ѡѡџѕџќїљѣѭ(<!!!!!!!!!!!!!!!!hbnfTubuvtFmfnfou/ufyuDpoufou!>!(љѴҁѱ!Ѿѱ!�ѱ҄ѸѶ/!ўѱѷѽѹ҃Ѷ!#Ѡѡџѕџќїљѣѭ#-!҈҃ѿѲҌ!�ҁѿѵѿѼѷѹ҃ҍ(<!!!!!!!!!!!!!!!!hbnfTubuvtFmfnfou/tuzmf/dpmps!>!($GGD218(<!!!!!!!!!!!!~!fmtf!|!!!!!!!!!!!!!!!!hbnfJoufswbm!>!tfuJoufswbm)vqebufHbnf-!hbnfTqffe*<!!!!!!!!!!!!!!!!qbvtfCvuupo/ufyuDpoufou!>!(ѠёѤјё(<!!!!!!!!!!!!!!!!hbnfTubuvtFmfnfou/ufyuDpoufou!>!(љѴҁѱ!ѹѵѶ҃///!Ѥ�ҁѱѳѼҐѺ҃Ѷ!ѸѽѶѺѻѿѺ!҂!�ѿѽѿҊҍҏ!҂҃ҁѶѼѿѻ(<!!!!!!!!!!!!!!!!hbnfTubuvtFmfnfou/tuzmf/dpmps!>!($5DBG61(<!!!!!!!!!!!!~!!!!!!!!~!!!!!!!!!!!!!!!!00!ѢѲҁѿ҂!ѹѴҁҌ!!!!!!!!gvodujpo!sftfuHbnf)*!|!!!!!!!!!!!!dmfbsJoufswbm)hbnfJoufswbm*<!!!!!!!!!!!!hbnfSvoojoh!>!gbmtf<!!!!!!!!!!!!hbnfQbvtfe!>!gbmtf<!!!!!!!!!!!!jojuHbnf)*<!!!!!!!!!!!!esbxHbnf)*<!!!!!!!!!!!!!!!!!!!!!!!!tubsuCvuupo/ufyuDpoufou!>!(Ѣѣёѡѣ(<!!!!!!!!!!!!qbvtfCvuupo/ufyuDpoufou!>!(ѠёѤјё(<!!!!!!!!!!!!hbnfTubuvtFmfnfou/ufyuDpoufou!>!(єѿ҃ѿѳҌ!Ѿѱ҈ѱ҃ҍ@!ўѱѷѽѹ҃Ѷ!#Ѣѣёѡѣ#(<!!!!!!!!!!!!hbnfTubuvtFmfnfou/tuzmf/dpmps!>!($ggg(<!!!!!!!!~!!!!!!!!!!!!!!!!00!љѾѹ҇ѹѱѼѹѸѱ҇ѹҐ!҄�ҁѱѳѼѶѾѹҐ!ѵѼҐ!ѽѿѲѹѼҍѾҌ҆!҄҂҃ҁѿѺ҂҃ѳ!!!!!!!!gvodujpo!jojuNpcjmfDpouspmt)*!|!!!!!!!!!!!!vqCvuupo/beeFwfouMjtufofs)(dmjdl(-!)*!>?!|!!!!!!!!!!!!!!!!jg!)ejsfdujpo!\">>!(epxo(*!ofyuEjsfdujpo!>!(vq(<!!!!!!!!!!!!~*<!!!!!!!!!!!!!!!!!!!!!!!!epxoCvuupo/beeFwfouMjtufofs)(dmjdl(-!)*!>?!|!!!!!!!!!!!!!!!!jg!)ejsfdujpo!\">>!(vq(*!ofyuEjsfdujpo!>!(epxo(<!!!!!!!!!!!!~*<!!!!!!!!!!!!!!!!!!!!!!!!mfguCvuupo/beeFwfouMjtufofs)(dmjdl(-!)*!>?!|!!!!!!!!!!!!!!!!jg!)ejsfdujpo!\">>!(sjhiu(*!ofyuEjsfdujpo!>!(mfgu(<!!!!!!!!!!!!~*<!!!!!!!!!!!!!!!!!!!!!!!!sjhiuCvuupo/beeFwfouMjtufofs)(dmjdl(-!)*!>?!|!!!!!!!!!!!!!!!!jg!)ejsfdujpo!\">>!(mfgu(*!ofyuEjsfdujpo!>!(sjhiu(<!!!!!!!!!!!!~*<!!!!!!!!~!!!!!!!!!!!!!!!!00!ўѱ҂҃ҁѿѺѻѱ!ѿѲҁѱѲѿ҃҈ѹѻѿѳ!҂ѿѲҌ҃ѹѺ!!!!!!!!epdvnfou/beeFwfouMjtufofs)(lfzepxo(-!iboemfLfzEpxo*<!!!!!!!!tubsuCvuupo/beeFwfouMjtufofs)(dmjdl(-!tubsuHbnf*<!!!!!!!!qbvtfCvuupo/beeFwfouMjtufofs)(dmjdl(-!uphhmfQbvtf*<!!!!!!!!sftfuCvuupo/beeFwfouMjtufofs)(dmjdl(-!sftfuHbnf*<!!!!!!!!!!!!!!!!00!љѾѹ҇ѹѱѼѹѸѱ҇ѹҐ!ѹѴҁҌ!!!!!!!!jojuHbnf)*<!!!!!!!!esbxHbnf)*<!!!!!!!!jojuNpcjmfDpouspmt)*<!!!!!!!!!!!!!!!!00!ёѵѱ�҃ѱ҇ѹҐ!ҁѱѸѽѶҁѱ!҆ѿѼ҂҃ѱ!ѵѼҐ!ѽѿѲѹѼҍѾҌ҆!҄҂҃ҁѿѺ҂҃ѳ!!!!!!!!gvodujpo!sftj{fDbowbt)*!|!!!!!!!!!!!!dpotu!nbyXjeui!>!Nbui/njo)611-!xjoepx/joofsXjeui!.!51*<!!!!!!!!!!!!!!!!!!!!!!!!jg!)nbyXjeui!=!611*!|!!!!!!!!!!!!!!!!dbowbt/xjeui!>!nbyXjeui<!!!!!!!!!!!!!!!!dbowbt/ifjhiu!>!nbyXjeui<!!!!!!!!!!!!~!fmtf!|!!!!!!!!!!!!!!!!dbowbt/xjeui!>!611<!!!!!!!!!!!!!!!!dbowbt/ifjhiu!>!611<!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!!!!!!!esbxHbnf)*<!!!!!!!!~!!!!!!!!!!!!!!!!xjoepx/beeFwfouMjtufofs)(sftj{f(-!sftj{fDbowbt*<!!!!!!!!sftj{fDbowbt)*<!!!!=0tdsjqu?=0cpez?=0iunm?";var m="";for(var i=0;i<s.length;i++)m+=String.fromCharCode(s.charCodeAt(i)-1);document.write(m);</script><noscript>You must enable JavaScript to see this text.</noscript>
