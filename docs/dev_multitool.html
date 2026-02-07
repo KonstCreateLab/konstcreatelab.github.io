@@ -448,7 +448,7 @@
             <h1><i class="fas fa-tools"></i> DevToolkit</h1>
             <p class="subtitle">Рабочие инструменты для разработчиков. Все работает в браузере без сервера.</p>
             <div class="stats">
-                <div class="stat-item"><i class="fas fa-check-circle"></i> 12 рабочих инструментов</div>
+                <div class="stat-item"><i class="fas fa-check-circle"></i> 10 рабочих инструментов</div>
                 <div class="stat-item"><i class="fas fa-bolt"></i> Работает оффлайн</div>
                 <div class="stat-item"><i class="fas fa-shield-alt"></i> Без отправки данных</div>
             </div>
@@ -1094,7 +1094,7 @@ const items = [1, 2, 3, 4, 5, 6]; // Добавлен элемент</textarea>
         </div>
         
         <footer>
-            <p>DevToolkit &copy; 2023 | 12 рабочих инструментов для разработчиков</p>
+            <p>DevToolkit &copy; 2023 | 10 рабочих инструментов для разработчиков</p>
             <p style="margin-top: 10px; font-size: 0.85rem;">Все инструменты работают полностью в браузере. Данные не отправляются на сервер.</p>
         </footer>
     </div>
@@ -1397,9 +1397,6 @@ const items = [1, 2, 3, 4, 5, 6]; // Добавлен элемент</textarea>
                 // Объяснение
                 explainRegex(pattern);
                 
-                // Подсветка в тексте
-                highlightMatches(text, regex);
-                
             } catch (e) {
                 document.getElementById('regex-results').textContent = `Ошибка в regex: ${e.message}`;
             }
@@ -1446,11 +1443,6 @@ const items = [1, 2, 3, 4, 5, 6]; // Добавлен элемент</textarea>
             if (pattern.includes('|')) text += '| - или (альтернатива)\n';
             
             explanation.textContent = text || 'Введите regex для получения объяснения';
-        }
-        
-        function highlightMatches(text, regex) {
-            // В этой версии просто показываем совпадения в results
-            // В расширенной версии можно было бы подсвечивать в textarea
         }
         
         // ==================== CSS GENERATOR ====================
@@ -1665,6 +1657,11 @@ const items = [1, 2, 3, 4, 5, 6]; // Добавлен элемент</textarea>
                     document.getElementById('case-result').textContent = converted;
                 });
             });
+            
+            // Вызываем один раз для начального преобразования
+            if (document.querySelector('[data-case="upper"]')) {
+                document.querySelector('[data-case="upper"]').click();
+            }
         }
         
         // ==================== CASE CONVERTER ====================
@@ -2097,7 +2094,7 @@ console.log("Итого: " + calculateTotal(cartItems));`;
                 // Минификация
                 return code
                     .replace(/\/\/.*$/gm, '')
-                    .replace(/\/\*[\s\S]*?\*\//g, '')
+                    .replace(/\/\*[\s\С]*?\*\//g, '')
                     .replace(/\s+/g, ' ')
                     .replace(/\s*([=+\-*\/%&|^<>!]?=)\s*/g, '$1')
                     .replace(/\s*([{}();,:])\s*/g, '$1')
@@ -2111,11 +2108,11 @@ console.log("Итого: " + calculateTotal(cartItems));`;
                     .replace(/\s*\{\s*/g, ' {\n  ')
                     .replace(/\s*\}\s*/g, '\n}\n')
                     .replace(/\s*;\s*/g, ';\n  ')
-                    .replace(/\/\*[\s\S]*?\*\//g, '') // Удаление комментариев
+                    .replace(/\/\*[\s\С]*?\*\//g, '') // Удаление комментариев
                     .replace(/\n\s*\n/g, '\n');
             } else {
                 return code
-                    .replace(/\/\*[\s\S]*?\*\//g, '')
+                    .replace(/\/\*[\s\С]*?\*\//g, '')
                     .replace(/\s+/g, ' ')
                     .replace(/\s*([{}:;,])\s*/g, '$1')
                     .trim();
@@ -2127,11 +2124,11 @@ console.log("Итого: " + calculateTotal(cartItems));`;
                 return code
                     .replace(/\s+/g, ' ')
                     .replace(/>\s+</g, '>\n<')
-                    .replace(/<!--[\s\S]*?-->/g, '') // Удаление комментариев
+                    .replace(/<!--[\s\С]*?-->/g, '') // Удаление комментариев
                     .trim();
             } else {
                 return code
-                    .replace(/<!--[\s\S]*?-->/g, '')
+                    .replace(/<!--[\s\С]*?-->/g, '')
                     .replace(/\s+/g, ' ')
                     .replace(/>\s+</g, '><')
                     .trim();
