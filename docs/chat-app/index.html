@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бесплатный Чат без Регистрации</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💬 Анонимный Чат</h1>
+            <p>Общайтесь без регистрации и входа. Сообщения хранятся 24 часа.</p>
+        </header>
+
+        <div class="chat-container">
+            <div class="messages" id="messages">
+                <!-- Сообщения будут здесь -->
+                <div class="empty-state">
+                    <p>💭 Здесь пока нет сообщений...</p>
+                    <p>Будьте первым, кто напишет что-то!</p>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <div class="user-info">
+                    <input type="text" 
+                           id="username" 
+                           placeholder="Ваше имя (по умолчанию: Аноним)"
+                           maxlength="20">
+                    <button id="colorPicker">🎨</button>
+                    <input type="color" 
+                           id="colorInput" 
+                           value="#2196f3" 
+                           style="display: none;">
+                </div>
+                
+                <div class="message-input">
+                    <textarea id="messageInput" 
+                              placeholder="Напишите сообщение..." 
+                              maxlength="500"></textarea>
+                    <button id="sendBtn">Отправить</button>
+                </div>
+                
+                <div class="info">
+                    <p>🔥 Онлайн: <span id="onlineCount">1</span></p>
+                    <p>💬 Сообщений: <span id="messageCount">0</span></p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Сообщения автоматически удаляются через 24 часа</p>
+            <p>Не указывайте личную информацию!</p>
+        </footer>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
