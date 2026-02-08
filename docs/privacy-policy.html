@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Политика конфиденциальности | ItzKonst</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #6c63ff;
+            --secondary: #4a44c6;
+            --accent: #ff6584;
+            --dark: #2a2a3c;
+            --light: #f8f9fa;
+            --gray: #e9ecef;
+            --text: #333;
+            --text-light: #6c757d;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .privacy-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .privacy-header {
+            background: linear-gradient(to right, var(--dark), var(--secondary));
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .privacy-header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .privacy-header p {
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+        
+        .privacy-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .section {
+            margin-bottom: 2.5rem;
+        }
+        
+        .section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section h2 i {
+            font-size: 1.3rem;
+        }
+        
+        .section p {
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+        
+        .section ul, .section ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+        
+        .section li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .highlight-box {
+            background-color: rgba(108, 99, 255, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+        
+        .highlight-box p {
+            color: var(--text);
+            font-weight: 500;
+            margin: 0;
+        }
+        
+        .contact-info {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+        
+        .contact-info h3 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .contact-info p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0.5rem;
+        }
+        
+        .update-date {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--gray);
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .cookie-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .cookie-type {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid var(--gray);
+        }
+        
+        .cookie-type h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .privacy-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .privacy-content {
+                padding: 1.5rem;
+            }
+            
+            .cookie-types {
+                grid-template-columns: 1fr;
+            }
+            
+            .back-button {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin-bottom: 1rem;
+                display: inline-flex;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .privacy-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .section h2 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="privacy-container">
+        <header class="privacy-header">
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Назад на сайт
+            </a>
+            <h1><i class="fas fa-shield-alt"></i> Политика конфиденциальности</h1>
+            <p>Узнайте, как мы собираем, используем и защищаем вашу информацию</p>
+        </header>
+        
+        <main class="privacy-content">
+            <div class="section">
+                <h2><i class="fas fa-info-circle"></i> Общие положения</h2>
+                <p>Настоящая Политика конфиденциальности персональных данных (далее — Политика конфиденциальности) действует в отношении всей информации, которую сайт <strong>ItzKonst</strong>, расположенный на доменном имени <strong>konstcreatelab.github.io</strong>, может получить о Пользователе во время использования сайта.</p>
+                <p>Использование сайта ItzKonst означает безоговорочное согласие Пользователя с настоящей Политикой и указанными в ней условиями обработки его персональной информации.</p>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-cookie-bite"></i> Использование файлов Cookies</h2>
+                <p>Сайт ItzKonst использует технологию cookies для улучшения работы сайта и повышения удобства его использования.</p>
+                
+                <div class="cookie-types">
+                    <div class="cookie-type">
+                        <h4><i class="fas fa-cookie"></i> Технические cookies</h4>
+                        <p>Необходимы для корректной работы сайта и его функций.</p>
+                    </div>
+                    <div class="cookie-type">
+                        <h4><i class="fas fa-chart-line"></i> Аналитические cookies</h4>
+                        <p>Помогают анализировать использование сайта и улучшать его.</p>
+                    </div>
+                    <div class="cookie-type">
+                        <h4><i class="fas fa-user-cog"></i> Функциональные cookies</h4>
+                        <p>Запоминают ваши предпочтения и настройки.</p>
+                    </div>
+                </div>
+                
+                <p>Вы можете отключить cookies в настройках вашего браузера, однако это может повлиять на работоспособность некоторых функций сайта.</p>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-database"></i> Какие данные мы собираем</h2>
+                <p>Мы можем собирать следующую информацию:</p>
+                <ul>
+                    <li>Технические данные (IP-адрес, тип браузера, версия ОС)</li>
+                    <li>Информация о посещенных страницах и времени пребывания на сайте</li>
+                    <li>Данные о принятии/отклонении политики cookies</li>
+                    <li>Другие анонимные данные для аналитики</li>
+                </ul>
+                
+                <div class="highlight-box">
+                    <p><i class="fas fa-exclamation-circle"></i> <strong>Важно:</strong> Мы не собираем персональные данные, такие как имя, фамилия, адрес электронной почты, номер телефона, если вы явно не предоставили их нам через формы обратной связи.</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-lock"></i> Защита данных</h2>
+                <p>Мы принимаем необходимые организационные и технические меры для защиты ваших данных от неправомерного или случайного доступа, уничтожения, изменения, блокирования, копирования, распространения, а также от иных неправомерных действий.</p>
+                <p>Защита данных осуществляется с помощью:</p>
+                <ol>
+                    <li>Шифрования соединения (HTTPS)</li>
+                    <li>Регулярного обновления систем безопасности</li>
+                    <li>Ограничения доступа к данным</li>
+                    <li>Регулярного мониторинга безопасности</li>
+                </ol>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-share-alt"></i> Передача данных третьим лицам</h2>
+                <p>Мы не передаем ваши данные третьим лицам, за исключением:</p>
+                <ul>
+                    <li>Случаев, предусмотренных законодательством РФ</li>
+                    <li>Для выполнения обязательств перед Пользователем</li>
+                    <li>При использовании сторонних сервисов аналитики (Google Analytics)</li>
+                </ul>
+                <p>Сторонние сервисы аналитики могут собирать анонимные данные о посещении сайта в соответствии со своими политиками конфиденциальности.</p>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-user-slash"></i> Управление данными и права пользователей</h2>
+                <p>Вы имеете право:</p>
+                <ul>
+                    <li>Отозвать согласие на обработку данных</li>
+                    <li>Запросить информацию о хранящихся данных</li>
+                    <li>Требовать удаления ваших данных</li>
+                    <li>Изменить настройки cookies в любое время</li>
+                </ul>
+                
+                <div class="highlight-box">
+                    <p><i class="fas fa-sync-alt"></i> <strong>Как изменить настройки cookies:</strong> Вы можете очистить cookies в настройках вашего браузера. После этого при повторном посещении сайта вам будет снова предложено принять или отклонить использование cookies.</p>
+                </div>
+            </div>
+            
+            <div class="contact-info">
+                <h3><i class="fas fa-envelope"></i> Контактная информация</h3>
+                <p>Если у вас есть вопросы по поводу настоящей Политики конфиденциальности, пожалуйста, свяжитесь с нами:</p>
+                <p><i class="fas fa-globe"></i> Сайт: <strong>konstcreatelab.github.io</strong></p>
+                <p><i class="fas fa-user-tie"></i> Email владельца: <strong>kostyounick2068@yandex.ru</strong></p>
+            </div>
+            
+            <div class="update-date">
+                <p><i class="fas fa-calendar-alt"></i> Последнее обновление: 8 февраля 2026 года</p>
+                <p>Мы можем периодически обновлять данную Политику. Рекомендуем регулярно проверять эту страницу для получения информации об изменениях.</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Анимация появления контента
+            const sections = document.querySelectorAll('.section');
+            sections.forEach((section, index) => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                
+                setTimeout(() => {
+                    section.style.opacity = '1';
+                    section.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+            
+            // Обработка нажатия кнопки "Назад"
+            const backButton = document.querySelector('.back-button');
+            backButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                history.back();
+            });
+        });
+    </script>
+</body>
+</html>
