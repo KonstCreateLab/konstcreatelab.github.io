@@ -31,6 +31,115 @@
             padding-bottom: 40px;
         }
         
+        /* Модальное окно для cookies */
+        .cookies-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .cookies-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .cookies-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            padding: 2.5rem;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(30px);
+            transition: transform 0.4s ease;
+        }
+        
+        .cookies-modal.active .cookies-content {
+            transform: translateY(0);
+        }
+        
+        .cookies-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        .cookies-title {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .cookies-text {
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .cookies-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 2rem;
+        }
+        
+        .cookies-btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .cookies-btn.accept {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+        }
+        
+        .cookies-btn.accept:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(108, 99, 255, 0.4);
+        }
+        
+        .cookies-btn.reject {
+            background-color: var(--gray);
+            color: var(--text);
+        }
+        
+        .cookies-btn.reject:hover {
+            background-color: #ddd;
+        }
+        
+        .cookies-info {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray);
+            font-size: 0.85rem;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+        
+        /* Остальные стили остаются без изменений */
         header {
             background: linear-gradient(to right, var(--dark), var(--secondary));
             color: white;
@@ -265,6 +374,14 @@
             .intro-card, .page-card {
                 padding: 1.5rem;
             }
+            
+            .cookies-content {
+                padding: 2rem 1.5rem;
+            }
+            
+            .cookies-buttons {
+                flex-direction: column;
+            }
         }
         
         @media (max-width: 480px) {
@@ -280,10 +397,41 @@
             h1 {
                 font-size: 1.7rem;
             }
+            
+            .cookies-title {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Модальное окно подтверждения использования cookies -->
+    <div class="cookies-modal active" id="cookiesModal">
+        <div class="cookies-content">
+            <div class="cookies-icon">
+                <i class="fas fa-cookie-bite"></i>
+            </div>
+            <h2 class="cookies-title">Использование Cookies</h2>
+            <p class="cookies-text">
+                Мы используем cookies для улучшения работы сайта, анализа трафика и персонализации контента. 
+                Принимая cookies, вы соглашаетесь с нашей политикой использования данных.
+            </p>
+            
+            <div class="cookies-buttons">
+                <button class="cookies-btn accept" id="acceptCookies">
+                    <i class="fas fa-check-circle"></i> Принять все cookies
+                </button>
+                <button class="cookies-btn reject" id="rejectCookies">
+                    <i class="fas fa-times-circle"></i> Отклонить
+                </button>
+            </div>
+            
+            <div class="cookies-info">
+                <p><i class="fas fa-info-circle"></i> Вы можете изменить свои настройки cookies в любое время. Подробнее в нашей <a href="#" style="color: var(--primary);">Политике конфиденциальности</a>.</p>
+            </div>
+        </div>
+    </div>
+    
     <header>
         <div class="logo">
             <i class="fas fa-code logo-icon"></i>
@@ -375,8 +523,88 @@
     </div>
 
     <script>
-        // Добавим интерактивности карточкам
+        // Обработка модального окна cookies
         document.addEventListener('DOMContentLoaded', function() {
+            const cookiesModal = document.getElementById('cookiesModal');
+            const acceptBtn = document.getElementById('acceptCookies');
+            const rejectBtn = document.getElementById('rejectCookies');
+            
+            // Проверяем, было ли уже принято решение о cookies
+            const cookiesAccepted = localStorage.getItem('cookiesAccepted');
+            
+            // Если решение уже принято, скрываем модальное окно
+            if (cookiesAccepted) {
+                cookiesModal.classList.remove('active');
+                // Восстанавливаем прокрутку страницы
+                document.body.style.overflow = 'auto';
+            } else {
+                // Блокируем прокрутку страницы при открытом модальном окне
+                document.body.style.overflow = 'hidden';
+                
+                // Добавляем обработчики событий для кнопок
+                acceptBtn.addEventListener('click', function() {
+                    localStorage.setItem('cookiesAccepted', 'true');
+                    localStorage.setItem('cookiesDecisionDate', new Date().toISOString());
+                    cookiesModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                    
+                    // Показываем уведомление о принятии
+                    showNotification('Настройки cookies приняты. Спасибо!');
+                });
+                
+                rejectBtn.addEventListener('click', function() {
+                    localStorage.setItem('cookiesAccepted', 'false');
+                    localStorage.setItem('cookiesDecisionDate', new Date().toISOString());
+                    cookiesModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                    
+                    // Показываем уведомление об отклонении
+                    showNotification('Настройки cookies отклонены. Некоторые функции сайта могут быть недоступны.');
+                });
+            }
+            
+            // Функция для показа уведомления
+            function showNotification(message) {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: linear-gradient(to right, var(--primary), var(--secondary));
+                    color: white;
+                    padding: 1rem 1.5rem;
+                    border-radius: 12px;
+                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                    z-index: 1001;
+                    transform: translateX(150%);
+                    transition: transform 0.4s ease;
+                    max-width: 350px;
+                `;
+                
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-info-circle"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Анимация появления
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(0)';
+                }, 100);
+                
+                // Автоматическое скрытие через 5 секунд
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(150%)';
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 400);
+                }, 5000);
+            }
+            
+            // Добавим интерактивности карточкам
             const cards = document.querySelectorAll('.page-card');
             
             cards.forEach(card => {
@@ -417,26 +645,28 @@
                 });
             }, observerOptions);
             
-            // Настройка анимации для карточек
-            const pageCards = document.querySelectorAll('.page-card');
-            pageCards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                card.style.transitionDelay = `${index * 0.1}s`;
-                observer.observe(card);
-            });
-            
-            // Анимация для заголовка
-            const title = document.querySelector('.section-title');
-            title.style.opacity = '0';
-            title.style.transform = 'translateX(-20px)';
-            title.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-            
-            setTimeout(() => {
-                title.style.opacity = '1';
-                title.style.transform = 'translateX(0)';
-            }, 300);
+            // Настройка анимации для карточек (только если cookies приняты)
+            if (cookiesAccepted !== 'false') {
+                const pageCards = document.querySelectorAll('.page-card');
+                pageCards.forEach((card, index) => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.transitionDelay = `${index * 0.1}s`;
+                    observer.observe(card);
+                });
+                
+                // Анимация для заголовка
+                const title = document.querySelector('.section-title');
+                title.style.opacity = '0';
+                title.style.transform = 'translateX(-20px)';
+                title.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                
+                setTimeout(() => {
+                    title.style.opacity = '1';
+                    title.style.transform = 'translateX(0)';
+                }, 300);
+            }
         });
     </script>
 </body>
