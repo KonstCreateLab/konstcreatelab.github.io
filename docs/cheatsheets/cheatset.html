@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>База шпаргалок для разработчика | ItzKonst</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-book"></i> База шпаргалок</h1>
+            <p class="subtitle">1000+ готовых примеров кода для разработки. Выбирайте, разблокируйте, используйте.</p>
+        </header>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Например: 'React хуки' или 'SQL join'...">
+                <button id="searchBtn"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="filters">
+                <select id="categoryFilter">
+                    <option value="">Все категории</option>
+                    <option value="HTML">HTML</option>
+                    <option value="CSS">CSS</option>
+                    <option value="JavaScript">JavaScript</option>
+                    <option value="React">React</option>
+                    <option value="Git">Git</option>
+                    <option value="Python">Python</option>
+                    <option value="SQL">SQL</option>
+                    <option value="Docker">Docker</option>
+                    <option value="Bash">Bash</option>
+                    <option value="Node.js">Node.js</option>
+                </select>
+                <select id="difficultyFilter">
+                    <option value="">Любая сложность</option>
+                    <option value="легкая">Легкая</option>
+                    <option value="средняя">Средняя</option>
+                    <option value="сложная">Сложная</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="stats">
+            <p>Доступно шпаргалок: <span id="totalCount">1000</span> | Найдено: <span id="filteredCount">1000</span></p>
+        </div>
+
+        <div class="cheatsheets-grid" id="cheatsheetsContainer">
+            <!-- Список шпаргалок будет загружен через JS -->
+        </div>
+
+        <div class="footer-note">
+            <p><i class="fas fa-lock"></i> Контент каждой шпаргалки защищён. Для просмотра нужно разблокировать.</p>
+            <p>Интеграция с <strong>Linkvertise</strong> | © ItzKonst</p>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
