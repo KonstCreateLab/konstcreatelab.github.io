@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Условия пользования | ItzKonst</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #6c63ff;
+            --secondary: #4a44c6;
+            --accent: #ff6584;
+            --dark: #2a2a3c;
+            --light: #f8f9fa;
+            --gray: #e9ecef;
+            --text: #333;
+            --text-light: #6c757d;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .terms-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .terms-header {
+            background: linear-gradient(to right, var(--dark), var(--secondary));
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .terms-header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .terms-header p {
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+        
+        .terms-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        .section:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .section h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section h2 i {
+            font-size: 1.3rem;
+        }
+        
+        .section p {
+            margin-bottom: 1.2rem;
+            color: var(--text-light);
+        }
+        
+        .section ul, .section ol {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-light);
+        }
+        
+        .section li {
+            margin-bottom: 0.8rem;
+            line-height: 1.5;
+        }
+        
+        .highlight-box {
+            background-color: rgba(108, 99, 255, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+        
+        .highlight-box p {
+            color: var(--text);
+            font-weight: 500;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .warning-box {
+            background-color: rgba(255, 101, 132, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+        
+        .warning-box p {
+            color: var(--text);
+            font-weight: 500;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .contact-info {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+        
+        .contact-info h3 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .contact-info p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 0.5rem;
+        }
+        
+        .update-date {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--gray);
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .tool-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .tool-item {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid var(--gray);
+            transition: transform 0.3s ease;
+        }
+        
+        .tool-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tool-item h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tool-item p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        
+        @media (max-width: 768px) {
+            .terms-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .terms-content {
+                padding: 1.5rem;
+            }
+            
+            .tool-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .back-button {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin-bottom: 1rem;
+                display: inline-flex;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .terms-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .section h2 {
+                font-size: 1.3rem;
+            }
+            
+            .section {
+                margin-bottom: 1.5rem;
+                padding-bottom: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="terms-container">
+        <header class="terms-header">
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Назад на сайт
+            </a>
+            <h1><i class="fas fa-file-contract"></i> Условия пользования</h1>
+            <p>Правила использования инструментов и сервисов ItzKonst</p>
+        </header>
+        
+        <main class="terms-content">
+            <div class="section">
+                <h2><i class="fas fa-gavel"></i> Общие положения</h2>
+                <p>Настоящие Условия пользования (далее — Условия) регулируют использование веб-сайтов и инструментов, доступных на домене <strong>konstcreatelab.github.io</strong> под брендом <strong>ItzKonst</strong>.</p>
+                <p>Используя любой из представленных инструментов или сервисов, вы соглашаетесь с настоящими Условиями, а также с нашей <a href="privacy-policy.html" style="color: var(--primary);">Политикой конфиденциальности</a>.</p>
+                
+                <div class="highlight-box">
+                    <p><i class="fas fa-exclamation-circle"></i> Все инструменты ItzKonst работают полностью в браузере и не требуют регистрации или создания учетной записи.</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-tools"></i> Доступные инструменты и их особенности</h2>
+                <p>На сайте ItzKonst представлены следующие инструменты:</p>
+                
+                <div class="tool-list">
+                    <div class="tool-item">
+                        <h4><i class="fas fa-gamepad"></i> Игра "Змейка"</h4>
+                        <p>Классическая браузерная игра. Все данные (счет, рекорд) хранятся локально в вашем браузере.</p>
+                    </div>
+                    <div class="tool-item">
+                        <h4><i class="fas fa-dharmachakra"></i> Колесо фортуны</h4>
+                        <p>Инструмент для принятия случайных решений. Настройки сохраняются локально в вашем браузере.</p>
+                    </div>
+                    <div class="tool-item">
+                        <h4><i class="fas fa-terminal"></i> Эмулятор терминала Linux</h4>
+                        <p>Образовательный инструмент для изучения команд терминала. Работает полностью в браузере, без доступа к реальной системе.</p>
+                    </div>
+                    <div class="tool-item">
+                        <h4><i class="fas fa-code"></i> DevToolkit</h4>
+                        <p>Набор инструментов для разработчиков (JSON форматер, кодировщик, regex тестер и другие). Все вычисления выполняются локально.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-user-check"></i> Условия использования инструментов</h2>
+                <p>При использовании инструментов ItzKonst вы соглашаетесь:</p>
+                <ol>
+                    <li>Использовать инструменты только в законных целях</li>
+                    <li>Не пытаться взломать, изменить или нарушить работу инструментов</li>
+                    <li>Не использовать инструменты для создания вредоносного контента</li>
+                    <li>Не перегружать сервисы чрезмерным количеством запросов</li>
+                    <li>Не использовать автоматизированные скрипты для взаимодействия с инструментами без явного разрешения</li>
+                </ol>
+                
+                <div class="warning-box">
+                    <p><i class="fas fa-exclamation-triangle"></i> <strong>Важно:</strong> Эмулятор терминала Linux является учебным инструментом и не предоставляет доступ к реальной системе. Не вводите реальные пароли или конфиденциальные данные.</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-shield-alt"></i> Ограничения ответственности</h2>
+                <p>Инструменты ItzKonst предоставляются "как есть" без каких-либо гарантий:</p>
+                <ul>
+                    <li>Мы не гарантируем бесперебойную работу инструментов</li>
+                    <li>Мы не несем ответственности за любые потери данных, возникшие при использовании инструментов</li>
+                    <li>Мы не несем ответственности за решения, принятые на основе работы инструментов (например, результаты "Колеса фортуны")</li>
+                    <li>Инструменты DevToolkit предназначены для вспомогательных целей и не заменяют профессиональное программное обеспечение</li>
+                </ul>
+                
+                <div class="highlight-box">
+                    <p><i class="fas fa-laptop-code"></i> <strong>Для разработчиков:</strong> Исходный код большинства инструментов открыт и доступен на GitHub. Вы можете использовать его в образовательных целях или для создания собственных проектов с указанием авторства.</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-ban"></i> Запрещенное использование</h2>
+                <p>Запрещается использовать инструменты ItzKonst для:</p>
+                <ul>
+                    <li>Создания или распространения вредоносного программного обеспечения</li>
+                    <li>Обхода систем безопасности или защиты</li>
+                    <li>Незаконной деятельности любого рода</li>
+                    <li>Нарушения прав интеллектуальной собственности</li>
+                    <li>Рассылки спама или нежелательных сообщений</li>
+                    <li>Сбора личных данных без согласия пользователей</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-child"></i> Возрастные ограничения</h2>
+                <p>Большинство инструментов ItzKonst не имеют возрастных ограничений и подходят для пользователей всех возрастов. Однако:</p>
+                <ul>
+                    <li>Игра "Змейка" и "Колесо фортуны" подходят для всех возрастов</li>
+                    <li>Эмулятор терминала и DevToolkit могут быть более интересны пользователям от 13 лет и старше</li>
+                    <li>Детям до 13 лет рекомендуется использовать инструменты под присмотром взрослых</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-cogs"></i> Технические требования</h2>
+                <p>Для корректной работы инструментов ItzKonst рекомендуется:</p>
+                <ul>
+                    <li>Современный веб-браузер (Chrome 80+, Firefox 75+, Safari 13+, Edge 80+)</li>
+                    <li>Включенный JavaScript в браузере</li>
+                    <li>Доступ к интернету для первоначальной загрузки инструментов</li>
+                    <li>Некоторые инструменты могут работать оффлайн после загрузки</li>
+                    <li>Минимум 100 МБ свободного места для локального хранения данных</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-balance-scale"></i> Интеллектуальная собственность</h2>
+                <p>Все инструменты, дизайн и контент на сайте ItzKonst являются интеллектуальной собственностью владельца сайта, если не указано иное.</p>
+                <p>Вы можете:</p>
+                <ul>
+                    <li>Использовать инструменты для личных и образовательных целей</li>
+                    <li>Ссылаться на инструменты ItzKonst в своих проектах</li>
+                    <li>Изучать исходный код для обучения</li>
+                </ul>
+                <p>Вы не можете:</p>
+                <ul>
+                    <li>Копировать и переиздавать инструменты без разрешения</li>
+                    <li>Использовать бренд ItzKonst для продвижения собственных продуктов</li>
+                    <li>Представлять инструменты как свои собственные</li>
+                </ul>
+            </div>
+            
+            <div class="contact-info">
+                <h3><i class="fas fa-question-circle"></i> Вопросы и обратная связь</h3>
+                <p>Если у вас есть вопросы по поводу настоящих Условий пользования или предложения по улучшению инструментов, пожалуйста, свяжитесь с нами:</p>
+                <p><i class="fas fa-globe"></i> Сайт: <strong>konstcreatelab.github.io</strong></p>
+                <p><i class="fas fa-envelope"></i> Email: <strong>kostyounick2068@yandex.ru</strong></p>
+            </div>
+            
+            <div class="update-date">
+                <p><i class="fas fa-calendar-alt"></i> Последнее обновление: 8 февраля 2026 года</p>
+                <p>Мы оставляем за собой право изменять настоящие Условия. Текущая версия всегда доступна на этой странице.</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Анимация появления контента
+            const sections = document.querySelectorAll('.section');
+            sections.forEach((section, index) => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                
+                setTimeout(() => {
+                    section.style.opacity = '1';
+                    section.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+            
+            // Обработка нажатия кнопки "Назад"
+            const backButton = document.querySelector('.back-button');
+            backButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                history.back();
+            });
+            
+            // Подсветка текущего раздела при прокрутке
+            const observerOptions = {
+                threshold: 0.2,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.backgroundColor = 'rgba(108, 99, 255, 0.03)';
+                        entry.target.style.paddingLeft = '20px';
+                        entry.target.style.transition = 'background-color 0.3s ease, padding-left 0.3s ease';
+                        
+                        setTimeout(() => {
+                            if (entry.isIntersecting) {
+                                entry.target.style.backgroundColor = '';
+                                entry.target.style.paddingLeft = '';
+                            }
+                        }, 1500);
+                    }
+                });
+            }, observerOptions);
+            
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
