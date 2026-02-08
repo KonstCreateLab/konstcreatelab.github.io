@@ -288,9 +288,11 @@
         }
         
         .counter {
-            font-size: 1.5rem;
+            font-size: 2.5rem;
             color: #72efdd;
             margin: 20px 0;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(114, 239, 221, 0.5);
         }
         
         .spinner {
@@ -366,6 +368,52 @@
             color: #b8b8d1;
             margin-top: 5px;
         }
+        
+        .timer-settings {
+            background-color: rgba(10, 25, 47, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+        
+        .timer-display {
+            font-size: 1.2rem;
+            color: #f72585;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .countdown-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .timer-btn {
+            padding: 8px 15px;
+            background-color: rgba(76, 201, 240, 0.2);
+            border: 1px solid #4cc9f0;
+            border-radius: 6px;
+            color: #72efdd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .timer-btn:hover {
+            background-color: rgba(76, 201, 240, 0.4);
+        }
+        
+        .stop-btn {
+            background-color: rgba(247, 37, 133, 0.2);
+            border-color: #f72585;
+            color: #f72585;
+        }
+        
+        .stop-btn:hover {
+            background-color: rgba(247, 37, 133, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -440,6 +488,19 @@ https://instagram.com/elena_style
                     <input type="text" id="prizeDescription" placeholder="Например: iPhone 15, 5000 руб., годовая подписка">
                 </div>
                 
+                <div class="timer-settings">
+                    <label for="countdownTime">Время обратного отсчета (секунды):</label>
+                    <input type="number" id="countdownTime" value="5" min="1" max="300">
+                    <div class="timer-display">Таймер: <span id="timerValue">5</span> сек.</div>
+                    
+                    <div class="countdown-controls">
+                        <div class="timer-btn" id="quick5">5 сек</div>
+                        <div class="timer-btn" id="quick10">10 сек</div>
+                        <div class="timer-btn" id="quick30">30 сек</div>
+                        <div class="timer-btn" id="quick60">60 сек</div>
+                    </div>
+                </div>
+                
                 <div class="social-stats">
                     <div class="stat-item">
                         <div class="stat-value" id="totalParticipants">0</div>
@@ -485,7 +546,13 @@ https://instagram.com/elena_style
                         
                         <div id="spinner" class="spinner hidden"></div>
                         
-                        <div class="counter hidden" id="countdown">3</div>
+                        <div class="counter hidden" id="countdown">5</div>
+                        
+                        <div class="buttons hidden" id="stopButton">
+                            <button class="stop-btn" id="stopCountdown">
+                                <span>⏹️</span> Остановить отсчет
+                            </button>
+                        </div>
                         
                         <div class="history">
                             <h3 class="history-title">История победителей</h3>
@@ -508,6 +575,8 @@ https://instagram.com/elena_style
         // Текущая выбранная соцсеть
         let selectedSocial = 'vk';
         let winnersHistory = [];
+        let countdownInterval = null;
+        let countdownActive = false;
         
         // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
@@ -547,10 +616,35 @@ https://instagram.com/elena_style
             // Обработчик для копирования списка
             document.getElementById('copyResults').addEventListener('click', copyResults);
             
+            // Обработчик для остановки отсчета
+            document.getElementById('stopCountdown').addEventListener('click', stopCountdown);
+            
             // Обновление счетчиков при изменении текста
             document.getElementById('participants').addEventListener('input', updateParticipantsCount);
             document.getElementById('winnersCount').addEventListener('input', function() {
                 document.getElementById('winnersToSelect').textContent = this.value;
+            });
+            
+            // Обновление значения таймера
+            document.getElementById('countdownTime').addEventListener('input', function() {
+                document.getElementById('timerValue').textContent = this.value;
+            });
+            
+            // Быстрые кнопки таймера
+            document.getElementById('quick5').addEventListener('click', function() {
+                setTimerValue(5);
+            });
+            
+            document.getElementById('quick10').addEventListener('click', function() {
+                setTimerValue(10);
+            });
+            
+            document.getElementById('quick30').addEventListener('click', function() {
+                setTimerValue(30);
+            });
+            
+            document.getElementById('quick60').addEventListener('click', function() {
+                setTimerValue(60);
             });
             
             // Инициализируем счетчик победителей
@@ -559,6 +653,12 @@ https://instagram.com/elena_style
             // Загружаем историю из localStorage
             loadHistory();
         });
+        
+        // Функция установки значения таймера
+        function setTimerValue(seconds) {
+            document.getElementById('countdownTime').value = seconds;
+            document.getElementById('timerValue').textContent = seconds;
+        }
         
         // Функция обновления счетчиков участников
         function updateParticipantsCount() {
@@ -604,10 +704,16 @@ https://instagram.com/elena_style
         
         // Функция выбора победителя
         function pickWinner() {
+            if (countdownActive) {
+                alert('Отсчет уже идет! Дождитесь его завершения или остановите.');
+                return;
+            }
+            
             const textarea = document.getElementById('participants');
             const participantsText = textarea.value;
             const winnersCount = parseInt(document.getElementById('winnersCount').value);
             const prizeDescription = document.getElementById('prizeDescription').value;
+            const countdownTime = parseInt(document.getElementById('countdownTime').value);
             
             // Получаем всех участников
             let participants = participantsText.split('\n');
@@ -656,87 +762,139 @@ https://instagram.com/elena_style
             const countdown = document.getElementById('countdown');
             const winnerName = document.getElementById('winnerName');
             const winnerInfo = document.getElementById('winnerInfo');
+            const stopButton = document.getElementById('stopButton');
             
             spinner.classList.remove('hidden');
             countdown.classList.remove('hidden');
+            stopButton.classList.remove('hidden');
             winnerName.textContent = '';
             winnerInfo.textContent = '';
             
-            // Анимация обратного отсчета
-            let count = 60;
-            countdown.textContent = count;
+            // Сохраняем участников для использования после отсчета
+            const finalParticipants = [...participants];
             
-            const countdownInterval = setInterval(() => {
+            // Устанавливаем флаг активности отсчета
+            countdownActive = true;
+            
+            // Анимация обратного отсчета
+            let count = countdownTime;
+            countdown.textContent = formatTime(count);
+            
+            countdownInterval = setInterval(() => {
                 count--;
-                countdown.textContent = count;
+                countdown.textContent = formatTime(count);
                 
                 if (count <= 0) {
-                    clearInterval(countdownInterval);
-                    
-                    // Скрываем спиннер и счетчик
-                    spinner.classList.add('hidden');
-                    countdown.classList.add('hidden');
-                    
-                    // Выбираем победителей
-                    let winners = [];
-                    let availableParticipants = [...participants];
-                    
-                    for (let i = 0; i < winnersCount; i++) {
-                        const randomIndex = Math.floor(Math.random() * availableParticipants.length);
-                        winners.push(availableParticipants[randomIndex]);
-                        availableParticipants.splice(randomIndex, 1);
-                    }
-                    
-                    // Отображаем победителей
-                    if (winnersCount === 1) {
-                        winnerName.textContent = winners[0];
-                        winnerInfo.textContent = `Поздравляем победителя! ${prizeDescription ? `Приз: ${prizeDescription}` : ''}`;
-                    } else {
-                        winnerName.textContent = `${winnersCount} победителей!`;
-                        winnerInfo.innerHTML = `<strong>Победители:</strong><br>${winners.map((w, i) => `${i+1}. ${w}`).join('<br>')}`;
-                        
-                        if (prizeDescription) {
-                            winnerInfo.innerHTML += `<br><br><strong>Приз:</strong> ${prizeDescription}`;
-                        }
-                    }
-                    
-                    // Добавляем анимацию
-                    winnerName.classList.add('pulse');
-                    
-                    // Добавляем конфетти
-                    createConfetti();
-                    
-                    // Сохраняем в историю
-                    const socialNames = {
-                        'vk': 'ВКонтакте',
-                        'instagram': 'Instagram',
-                        'telegram': 'Telegram',
-                        'youtube': 'YouTube',
-                        'facebook': 'Facebook',
-                        'twitter': 'Twitter',
-                        'tiktok': 'TikTok'
-                    };
-                    
-                    const historyEntry = {
-                        date: new Date().toLocaleString('ru-RU'),
-                        social: socialNames[selectedSocial],
-                        winners: winners,
-                        prize: prizeDescription,
-                        totalParticipants: participants.length
-                    };
-                    
-                    winnersHistory.unshift(historyEntry);
-                    updateWinnersHistory();
-                    
-                    // Сохраняем историю в localStorage
-                    saveHistory();
-                    
-                    // Останавливаем пульсацию через 3 секунды
-                    setTimeout(() => {
-                        winnerName.classList.remove('pulse');
-                    }, 3000);
+                    finishCountdown(finalParticipants, winnersCount, prizeDescription);
                 }
-            }, 800);
+            }, 1000); // 1 секунда = 1000 миллисекунд
+        }
+        
+        // Функция форматирования времени
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Функция завершения отсчета
+        function finishCountdown(participants, winnersCount, prizeDescription) {
+            clearInterval(countdownInterval);
+            countdownActive = false;
+            
+            // Скрываем спиннер и счетчик
+            const spinner = document.getElementById('spinner');
+            const countdown = document.getElementById('countdown');
+            const winnerName = document.getElementById('winnerName');
+            const winnerInfo = document.getElementById('winnerInfo');
+            const stopButton = document.getElementById('stopButton');
+            
+            spinner.classList.add('hidden');
+            countdown.classList.add('hidden');
+            stopButton.classList.add('hidden');
+            
+            // Выбираем победителей
+            let winners = [];
+            let availableParticipants = [...participants];
+            
+            for (let i = 0; i < winnersCount; i++) {
+                const randomIndex = Math.floor(Math.random() * availableParticipants.length);
+                winners.push(availableParticipants[randomIndex]);
+                availableParticipants.splice(randomIndex, 1);
+            }
+            
+            // Отображаем победителей
+            if (winnersCount === 1) {
+                winnerName.textContent = winners[0];
+                winnerInfo.textContent = `Поздравляем победителя! ${prizeDescription ? `Приз: ${prizeDescription}` : ''}`;
+            } else {
+                winnerName.textContent = `${winnersCount} победителей!`;
+                winnerInfo.innerHTML = `<strong>Победители:</strong><br>${winners.map((w, i) => `${i+1}. ${w}`).join('<br>')}`;
+                
+                if (prizeDescription) {
+                    winnerInfo.innerHTML += `<br><br><strong>Приз:</strong> ${prizeDescription}`;
+                }
+            }
+            
+            // Добавляем анимацию
+            winnerName.classList.add('pulse');
+            
+            // Добавляем конфетти
+            createConfetti();
+            
+            // Сохраняем в историю
+            const socialNames = {
+                'vk': 'ВКонтакте',
+                'instagram': 'Instagram',
+                'telegram': 'Telegram',
+                'youtube': 'YouTube',
+                'facebook': 'Facebook',
+                'twitter': 'Twitter',
+                'tiktok': 'TikTok'
+            };
+            
+            const historyEntry = {
+                date: new Date().toLocaleString('ru-RU'),
+                social: socialNames[selectedSocial],
+                winners: winners,
+                prize: prizeDescription,
+                totalParticipants: participants.length
+            };
+            
+            winnersHistory.unshift(historyEntry);
+            updateWinnersHistory();
+            
+            // Сохраняем историю в localStorage
+            saveHistory();
+            
+            // Останавливаем пульсацию через 3 секунды
+            setTimeout(() => {
+                winnerName.classList.remove('pulse');
+            }, 3000);
+        }
+        
+        // Функция остановки отсчета
+        function stopCountdown() {
+            if (!countdownActive) return;
+            
+            clearInterval(countdownInterval);
+            countdownActive = false;
+            
+            // Скрываем элементы отсчета
+            const spinner = document.getElementById('spinner');
+            const countdown = document.getElementById('countdown');
+            const stopButton = document.getElementById('stopButton');
+            
+            spinner.classList.add('hidden');
+            countdown.classList.add('hidden');
+            stopButton.classList.add('hidden');
+            
+            // Показываем сообщение
+            const winnerName = document.getElementById('winnerName');
+            const winnerInfo = document.getElementById('winnerInfo');
+            
+            winnerName.textContent = "Отсчет остановлен";
+            winnerInfo.textContent = "Нажмите 'Выбрать победителя' для запуска нового розыгрыша";
         }
         
         // Функция перемешивания массива (алгоритм Фишера-Йетса)
