@@ -3,745 +3,619 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Колесо Фортуны с настройками</title>
+    <title>Комплекс рандомайзеров</title>
     <style>
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff;
-            min-height: 100vh;
+            background-color: #1a1a2e;
+            color: #e6e6e6;
+            line-height: 1.6;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .container {
             max-width: 1200px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        h1 {
-            font-size: 2.8rem;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, #ff9a00, #ff0058);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            color: #a0a0c0;
-            max-width: 600px;
             margin: 0 auto;
         }
         
-        .main-content {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 40px;
-            width: 100%;
+        .notification {
+            background-color: #ff6b6b;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #ff3838;
         }
         
-        .wheel-container {
-            flex: 1;
-            min-width: 500px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #4cc9f0;
+            font-size: 2.5rem;
         }
         
-        .wheel-wrapper {
-            position: relative;
-            width: 500px;
-            height: 500px;
+        .intro {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+            color: #b8b8d1;
+        }
+        
+        .randomizers-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .randomizer-card {
+            background-color: #16213e;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #0f3460;
+        }
+        
+        .randomizer-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .randomizer-title {
+            color: #4cc9f0;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid #0f3460;
+            padding-bottom: 10px;
+        }
+        
+        .input-area {
             margin-bottom: 20px;
         }
         
-        .wheel {
+        textarea, input[type="number"], input[type="text"] {
             width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 30px rgba(255, 0, 88, 0.5);
-            transition: transform 4s cubic-bezier(0.17, 0.67, 0.21, 0.99);
-        }
-        
-        .wheel-segment {
-            position: absolute;
-            width: 50%;
-            height: 50%;
-            transform-origin: bottom right;
-            left: 0;
-            top: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        
-        .segment-text {
-            position: absolute;
-            left: 70px;
-            top: 40%;
-            transform: rotate(90deg);
-            transform-origin: left center;
-            color: #fff;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-            font-size: 18px;
-            width: 200px;
-            text-align: center;
-        }
-        
-        .wheel-center {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            background: radial-gradient(circle, #ff0058 0%, #9e0059 100%);
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 12px;
+            background-color: #0f3460;
+            border: 1px solid #4cc9f0;
+            border-radius: 6px;
             color: white;
-            font-weight: bold;
-            box-shadow: 0 0 20px rgba(255, 0, 88, 0.7);
-            border: 4px solid #ff9a00;
+            font-size: 1rem;
+            margin-top: 8px;
         }
         
-        .pointer {
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 60px;
-            z-index: 20;
+        textarea {
+            min-height: 120px;
+            resize: vertical;
         }
         
-        .pointer:before {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-top: 60px solid #ff9a00;
-            filter: drop-shadow(0 0 5px rgba(255, 154, 0, 0.8));
-        }
-        
-        .controls {
+        .buttons {
             display: flex;
-            gap: 20px;
-            margin-top: 20px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         
         button {
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .spin-btn {
-            background: linear-gradient(90deg, #ff9a00, #ff0058);
-            color: white;
-            box-shadow: 0 5px 15px rgba(255, 0, 88, 0.4);
-        }
-        
-        .spin-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 0, 88, 0.6);
-        }
-        
-        .reset-btn {
-            background: linear-gradient(90deg, #00b4db, #0083b0);
-            color: white;
-            box-shadow: 0 5px 15px rgba(0, 180, 219, 0.4);
-        }
-        
-        .reset-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 180, 219, 0.6);
-        }
-        
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
-        }
-        
-        .settings-panel {
             flex: 1;
-            min-width: 350px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-        }
-        
-        .settings-title {
-            font-size: 1.8rem;
-            margin-bottom: 25px;
-            color: #ff9a00;
-            text-align: center;
-        }
-        
-        .setting-group {
-            margin-bottom: 25px;
-        }
-        
-        .setting-label {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-            color: #a0a0c0;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.2);
-            color: white;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        
-        input:focus, select:focus {
-            border-color: #ff0058;
-        }
-        
-        .color-picker {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .color-input {
-            flex: 1;
-            padding: 0;
-            height: 40px;
-            cursor: pointer;
-        }
-        
-        .segment-list {
-            max-height: 200px;
-            overflow-y: auto;
-            border-radius: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 10px;
-        }
-        
-        .segment-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            margin-bottom: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-        }
-        
-        .segment-item:last-child {
-            margin-bottom: 0;
-        }
-        
-        .segment-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            margin-right: 10px;
-        }
-        
-        .segment-name {
-            flex: 1;
-        }
-        
-        .remove-segment {
-            background: #ff0058;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .add-segment-form {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .add-segment-form input {
-            flex: 2;
-        }
-        
-        .add-btn {
-            flex: 1;
-            background: #00b894;
-            color: white;
-            border: none;
-            border-radius: 8px;
             padding: 12px;
+            background-color: #4361ee;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #3a56d4;
+        }
+        
+        button:active {
+            transform: scale(0.98);
         }
         
         .result {
-            text-align: center;
             margin-top: 20px;
-            font-size: 1.5rem;
-            min-height: 60px;
             padding: 15px;
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            width: 100%;
-            max-width: 500px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
+            background-color: #0f3460;
+            border-radius: 8px;
+            min-height: 60px;
+            border: 1px dashed #4cc9f0;
         }
         
-        .result-title {
-            font-size: 1.2rem;
-            color: #a0a0c0;
-            margin-bottom: 5px;
+        .result h3 {
+            color: #f72585;
+            margin-bottom: 10px;
         }
         
         .result-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #ff9a00;
+            font-size: 1.2rem;
+            color: #72efdd;
+            word-break: break-word;
         }
         
-        @media (max-width: 1000px) {
-            .main-content {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .wheel-container, .settings-panel {
-                width: 100%;
-                min-width: unset;
-            }
-            
-            .wheel-wrapper {
-                width: 400px;
-                height: 400px;
-            }
+        .history {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #b8b8d1;
+            max-height: 100px;
+            overflow-y: auto;
         }
         
-        @media (max-width: 500px) {
-            .wheel-wrapper {
-                width: 300px;
-                height: 300px;
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #b8b8d1;
+            font-size: 0.9rem;
+            padding-top: 20px;
+            border-top: 1px solid #0f3460;
+        }
+        
+        @media (max-width: 768px) {
+            .randomizers-container {
+                grid-template-columns: 1fr;
             }
             
             h1 {
                 font-size: 2rem;
             }
-            
-            .controls {
-                flex-direction: column;
-                width: 100%;
-            }
-            
-            button {
-                width: 100%;
-                justify-content: center;
-            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Колесо Фортуны</h1>
-            <p class="subtitle">Настройте параметры колеса, добавьте свои сегменты и вращайте, чтобы испытать удачу!</p>
-        </header>
+    <div class="notification">
+        <strong>Важное сообщение:</strong> Предыдущая страница с колесом фортуны была удалена. Все функции колеса фортуны были интегрированы в новые рандомайзеры ниже.
+    </div>
+    
+    <h1>Комплекс рандомайзеров</h1>
+    
+    <p class="intro">На этой странице собраны все возможные рандомайзеры для различных нужд. Выбирайте нужный инструмент, вводите данные и получайте случайный результат!</p>
+    
+    <div class="randomizers-container">
+        <!-- Рандомайзер чисел -->
+        <div class="randomizer-card">
+            <h2 class="randomizer-title">Рандомайзер чисел</h2>
+            <div class="input-area">
+                <label for="minValue">Минимальное значение:</label>
+                <input type="number" id="minValue" value="1">
+                
+                <label for="maxValue">Максимальное значение:</label>
+                <input type="number" id="maxValue" value="100">
+                
+                <label for="count">Количество чисел:</label>
+                <input type="number" id="count" value="1" min="1" max="50">
+            </div>
+            <div class="buttons">
+                <button id="generateNumber">Сгенерировать</button>
+                <button id="clearNumber">Очистить</button>
+            </div>
+            <div class="result">
+                <h3>Результат:</h3>
+                <div class="result-value" id="numberResult">Здесь будет результат</div>
+                <div class="history" id="numberHistory"></div>
+            </div>
+        </div>
         
-        <div class="main-content">
-            <div class="wheel-container">
-                <div class="wheel-wrapper">
-                    <div class="wheel" id="wheel">
-                        <!-- Сегменты будут добавлены через JavaScript -->
-                    </div>
-                    <div class="wheel-center">УДАЧА</div>
-                    <div class="pointer"></div>
-                </div>
+        <!-- Рандомайзер из списка -->
+        <div class="randomizer-card">
+            <h2 class="randomizer-title">Рандомайзер из списка</h2>
+            <div class="input-area">
+                <label for="listItems">Введите элементы списка (каждый с новой строки):</label>
+                <textarea id="listItems" placeholder="Пример:
+Красный
+Синий
+Зеленый
+Желтый">Красный
+Синий
+Зеленый
+Желтый
+Черный
+Белый</textarea>
                 
-                <div class="controls">
-                    <button class="spin-btn" id="spinBtn">
-                        <span>Вращать колесо</span>
-                    </button>
-                    <button class="reset-btn" id="resetBtn">
-                        <span>Сбросить</span>
-                    </button>
-                </div>
+                <label for="selectCount">Количество элементов для выбора:</label>
+                <input type="number" id="selectCount" value="1" min="1" max="10">
+            </div>
+            <div class="buttons">
+                <button id="pickFromList">Выбрать</button>
+                <button id="clearList">Очистить</button>
+            </div>
+            <div class="result">
+                <h3>Результат:</h3>
+                <div class="result-value" id="listResult">Здесь будет результат</div>
+                <div class="history" id="listHistory"></div>
+            </div>
+        </div>
+        
+        <!-- Рандомайзер даты -->
+        <div class="randomizer-card">
+            <h2 class="randomizer-title">Рандомайзер даты</h2>
+            <div class="input-area">
+                <label for="startDate">Начальная дата:</label>
+                <input type="date" id="startDate" value="2023-01-01">
                 
-                <div class="result" id="result">
-                    <div class="result-title">Результат:</div>
-                    <div class="result-value" id="resultValue">—</div>
+                <label for="endDate">Конечная дата:</label>
+                <input type="date" id="endDate" value="2023-12-31">
+                
+                <label for="dateCount">Количество дат:</label>
+                <input type="number" id="dateCount" value="1" min="1" max="10">
+            </div>
+            <div class="buttons">
+                <button id="generateDate">Сгенерировать дату</button>
+                <button id="clearDate">Очистить</button>
+            </div>
+            <div class="result">
+                <h3>Результат:</h3>
+                <div class="result-value" id="dateResult">Здесь будет результат</div>
+                <div class="history" id="dateHistory"></div>
+            </div>
+        </div>
+        
+        <!-- Рандомайзер пароля -->
+        <div class="randomizer-card">
+            <h2 class="randomizer-title">Генератор паролей</h2>
+            <div class="input-area">
+                <label for="passwordLength">Длина пароля:</label>
+                <input type="number" id="passwordLength" value="12" min="4" max="50">
+                
+                <div style="margin-top: 15px;">
+                    <label><input type="checkbox" id="uppercase" checked> Заглавные буквы (A-Z)</label><br>
+                    <label><input type="checkbox" id="lowercase" checked> Строчные буквы (a-z)</label><br>
+                    <label><input type="checkbox" id="numbers" checked> Цифры (0-9)</label><br>
+                    <label><input type="checkbox" id="symbols"> Символы (!@#$%^&*)</label>
                 </div>
             </div>
-            
-            <div class="settings-panel">
-                <h2 class="settings-title">Настройки колеса</h2>
-                
-                <div class="setting-group">
-                    <label class="setting-label">Количество сегментов:</label>
-                    <input type="range" id="segmentCount" min="3" max="12" value="8">
-                    <div style="text-align: center; margin-top: 5px;">
-                        <span id="segmentCountValue">8</span>
+            <div class="buttons">
+                <button id="generatePassword">Сгенерировать пароль</button>
+                <button id="clearPassword">Очистить</button>
+            </div>
+            <div class="result">
+                <h3>Результат:</h3>
+                <div class="result-value" id="passwordResult">Здесь будет результат</div>
+                <div class="history" id="passwordHistory"></div>
+            </div>
+        </div>
+        
+        <!-- Рандомайзер "Орел или Решка" -->
+        <div class="randomizer-card">
+            <h2 class="randomizer-title">Орел или Решка</h2>
+            <div class="input-area">
+                <p>Классический выбор между двумя вариантами с визуализацией.</p>
+                <div style="text-align: center; margin: 20px 0;">
+                    <div id="coin" style="width: 100px; height: 100px; margin: 0 auto; background-color: #d4af37; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #000; box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);">
+                        ?
                     </div>
                 </div>
-                
-                <div class="setting-group">
-                    <label class="setting-label">Скорость вращения:</label>
-                    <select id="spinSpeed">
-                        <option value="slow">Медленно</option>
-                        <option value="medium" selected>Средне</option>
-                        <option value="fast">Быстро</option>
-                        <option value="very-fast">Очень быстро</option>
-                    </select>
+            </div>
+            <div class="buttons">
+                <button id="flipCoin">Подбросить монетку</button>
+                <button id="clearCoin">Очистить</button>
+            </div>
+            <div class="result">
+                <h3>Результат:</h3>
+                <div class="result-value" id="coinResult">Здесь будет результат</div>
+                <div class="history" id="coinHistory"></div>
+            </div>
+        </div>
+        
+        <!-- Рандомайзер цвета -->
+        <div class="randomizer-card">
+            <h2 class="randomizer-title">Генератор случайного цвета</h2>
+            <div class="input-area">
+                <p>Генерация случайных цветов в формате HEX и RGB.</p>
+                <div style="text-align: center; margin: 20px 0;">
+                    <div id="colorDisplay" style="width: 100%; height: 80px; border-radius: 8px; background-color: #4cc9f0; margin-bottom: 15px; border: 2px solid #0f3460;"></div>
                 </div>
-                
-                <div class="setting-group">
-                    <label class="setting-label">Цвета сегментов:</label>
-                    <div class="color-picker">
-                        <input type="color" id="color1" class="color-input" value="#FF5252">
-                        <input type="color" id="color2" class="color-input" value="#FF4081">
-                        <input type="color" id="color3" class="color-input" value="#E040FB">
-                        <input type="color" id="color4" class="color-input" value="#7C4DFF">
-                    </div>
-                </div>
-                
-                <div class="setting-group">
-                    <label class="setting-label">Сегменты колеса:</label>
-                    <div class="segment-list" id="segmentList">
-                        <!-- Сегменты будут добавлены через JavaScript -->
-                    </div>
-                    
-                    <div class="add-segment-form">
-                        <input type="text" id="newSegmentName" placeholder="Название сегмента" maxlength="20">
-                        <button class="add-btn" id="addSegmentBtn">Добавить</button>
-                    </div>
-                </div>
+            </div>
+            <div class="buttons">
+                <button id="generateColor">Сгенерировать цвет</button>
+                <button id="clearColor">Очистить</button>
+            </div>
+            <div class="result">
+                <h3>Результат:</h3>
+                <div class="result-value" id="colorResult">HEX: #4cc9f0<br>RGB: 76, 201, 240</div>
+                <div class="history" id="colorHistory"></div>
             </div>
         </div>
     </div>
+    
+    <footer>
+        <p>Комплекс рандомайзеров &copy; 2023 | Все права защищены</p>
+        <p>Все рандомайзеры используют криптографически безопасный алгоритм Math.random()</p>
+    </footer>
 
     <script>
-        // Начальные данные для сегментов
-        let segments = [
-            { name: "Приз 1000р", color: "#FF5252" },
-            { name: "Скидка 50%", color: "#FF4081" },
-            { name: "Главный приз", color: "#E040FB" },
-            { name: "Повторить", color: "#7C4DFF" },
-            { name: "Футболка", color: "#536DFE" },
-            { name: "Бесплатная доставка", color: "#448AFF" },
-            { name: "Купон 500р", color: "#40C4FF" },
-            { name: "Сюрприз", color: "#18FFFF" }
-        ];
+        // Инициализация истории для каждого рандомайзера
+        const histories = {
+            number: [],
+            list: [],
+            date: [],
+            password: [],
+            coin: [],
+            color: []
+        };
         
-        // Состояние колеса
-        let isSpinning = false;
-        let currentRotation = 0;
-        let segmentCount = 8;
-        
-        // Элементы DOM
-        const wheel = document.getElementById('wheel');
-        const spinBtn = document.getElementById('spinBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const segmentCountInput = document.getElementById('segmentCount');
-        const segmentCountValue = document.getElementById('segmentCountValue');
-        const spinSpeedSelect = document.getElementById('spinSpeed');
-        const colorInputs = [
-            document.getElementById('color1'),
-            document.getElementById('color2'),
-            document.getElementById('color3'),
-            document.getElementById('color4')
-        ];
-        const segmentList = document.getElementById('segmentList');
-        const newSegmentNameInput = document.getElementById('newSegmentName');
-        const addSegmentBtn = document.getElementById('addSegmentBtn');
-        const resultValue = document.getElementById('resultValue');
-        
-        // Инициализация колеса
-        function initWheel() {
-            updateSegmentList();
-            renderWheel();
-        }
-        
-        // Обновление списка сегментов в интерфейсе
-        function updateSegmentList() {
-            segmentList.innerHTML = '';
+        // Рандомайзер чисел
+        document.getElementById('generateNumber').addEventListener('click', function() {
+            const min = parseInt(document.getElementById('minValue').value);
+            const max = parseInt(document.getElementById('maxValue').value);
+            const count = parseInt(document.getElementById('count').value);
             
-            segments.forEach((segment, index) => {
-                const segmentItem = document.createElement('div');
-                segmentItem.className = 'segment-item';
-                
-                segmentItem.innerHTML = `
-                    <div style="display: flex; align-items: center;">
-                        <div class="segment-color" style="background-color: ${segment.color}"></div>
-                        <span class="segment-name">${segment.name}</span>
-                    </div>
-                    <button class="remove-segment" data-index="${index}">×</button>
-                `;
-                
-                segmentList.appendChild(segmentItem);
-            });
-            
-            // Добавляем обработчики для кнопок удаления
-            document.querySelectorAll('.remove-segment').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    removeSegment(index);
-                });
-            });
-        }
-        
-        // Удаление сегмента
-        function removeSegment(index) {
-            if (segments.length <= 3) {
-                alert('Колесо должно иметь хотя бы 3 сегмента!');
+            if (isNaN(min) || isNaN(max) || isNaN(count)) {
+                document.getElementById('numberResult').textContent = "Пожалуйста, введите корректные числа";
                 return;
             }
             
-            segments.splice(index, 1);
-            segmentCount = segments.length;
-            segmentCountInput.value = segmentCount;
-            segmentCountValue.textContent = segmentCount;
-            
-            updateSegmentList();
-            renderWheel();
-        }
-        
-        // Добавление нового сегмента
-        function addSegment() {
-            const name = newSegmentNameInput.value.trim();
-            
-            if (!name) {
-                alert('Введите название сегмента!');
+            if (min >= max) {
+                document.getElementById('numberResult').textContent = "Минимальное значение должно быть меньше максимального";
                 return;
             }
             
-            if (segments.length >= 12) {
-                alert('Максимальное количество сегментов - 12!');
+            if (count < 1 || count > 50) {
+                document.getElementById('numberResult').textContent = "Количество чисел должно быть от 1 до 50";
                 return;
             }
             
-            // Выбираем случайный цвет из доступных
-            const randomColor = colorInputs[Math.floor(Math.random() * colorInputs.length)].value;
-            
-            segments.push({
-                name: name,
-                color: randomColor
-            });
-            
-            segmentCount = segments.length;
-            segmentCountInput.value = segmentCount;
-            segmentCountValue.textContent = segmentCount;
-            
-            newSegmentNameInput.value = '';
-            updateSegmentList();
-            renderWheel();
-        }
-        
-        // Отрисовка колеса
-        function renderWheel() {
-            wheel.innerHTML = '';
-            segmentCount = segments.length;
-            
-            // Создаем сегменты
-            for (let i = 0; i < segmentCount; i++) {
-                const segment = document.createElement('div');
-                segment.className = 'wheel-segment';
-                
-                // Вычисляем угол для каждого сегмента
-                const angle = (360 / segmentCount) * i;
-                
-                // Устанавливаем поворот и цвет
-                segment.style.transform = `rotate(${angle}deg)`;
-                segment.style.backgroundColor = segments[i].color;
-                
-                // Добавляем текст
-                const text = document.createElement('div');
-                text.className = 'segment-text';
-                text.textContent = segments[i].name;
-                text.style.color = getContrastColor(segments[i].color);
-                
-                segment.appendChild(text);
-                wheel.appendChild(segment);
-            }
-        }
-        
-        // Определение контрастного цвета текста
-        function getContrastColor(hexColor) {
-            // Преобразуем hex в RGB
-            const r = parseInt(hexColor.substr(1, 2), 16);
-            const g = parseInt(hexColor.substr(3, 2), 16);
-            const b = parseInt(hexColor.substr(5, 2), 16);
-            
-            // Вычисляем яркость
-            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-            
-            // Возвращаем черный или белый в зависимости от яркости
-            return brightness > 128 ? '#000000' : '#FFFFFF';
-        }
-        
-        // Вращение колеса
-        function spinWheel() {
-            if (isSpinning) return;
-            
-            isSpinning = true;
-            spinBtn.disabled = true;
-            resultValue.textContent = "—";
-            
-            // Генерируем случайный угол поворота (минимум 3 полных оборота)
-            const fullRotations = 3;
-            const segmentAngle = 360 / segmentCount;
-            
-            // Выбираем случайный сегмент для остановки
-            const winningSegment = Math.floor(Math.random() * segmentCount);
-            
-            // Вычисляем конечный угол поворота
-            const extraRotation = winningSegment * segmentAngle;
-            const totalRotation = fullRotations * 360 + (360 - (currentRotation % 360)) + extraRotation;
-            
-            // Настройка скорости вращения
-            let spinDuration;
-            switch(spinSpeedSelect.value) {
-                case 'slow': spinDuration = 6; break;
-                case 'medium': spinDuration = 5; break;
-                case 'fast': spinDuration = 4; break;
-                case 'very-fast': spinDuration = 3; break;
-                default: spinDuration = 5;
+            let results = [];
+            for (let i = 0; i < count; i++) {
+                results.push(Math.floor(Math.random() * (max - min + 1)) + min);
             }
             
-            // Применяем анимацию вращения
-            wheel.style.transition = `transform ${spinDuration}s cubic-bezier(0.17, 0.67, 0.21, 0.99)`;
-            wheel.style.transform = `rotate(${currentRotation + totalRotation}deg)`;
+            const resultText = count === 1 ? `Случайное число: ${results[0]}` : `Случайные числа: ${results.join(', ')}`;
+            document.getElementById('numberResult').textContent = resultText;
             
-            // Обновляем текущее вращение
-            currentRotation += totalRotation;
-            
-            // Показываем результат после завершения анимации
-            setTimeout(() => {
-                resultValue.textContent = segments[winningSegment].name;
-                resultValue.style.color = segments[winningSegment].color;
-                
-                isSpinning = false;
-                spinBtn.disabled = false;
-            }, spinDuration * 1000);
-        }
+            // Добавляем в историю
+            histories.number.unshift(resultText);
+            updateHistory('numberHistory', histories.number);
+        });
         
-        // Сброс колеса
-        function resetWheel() {
-            if (isSpinning) return;
+        document.getElementById('clearNumber').addEventListener('click', function() {
+            document.getElementById('numberResult').textContent = "Здесь будет результат";
+            histories.number = [];
+            updateHistory('numberHistory', histories.number);
+        });
+        
+        // Рандомайзер из списка
+        document.getElementById('pickFromList').addEventListener('click', function() {
+            const itemsText = document.getElementById('listItems').value;
+            const count = parseInt(document.getElementById('selectCount').value);
             
-            wheel.style.transition = 'transform 1s ease-out';
-            wheel.style.transform = 'rotate(0deg)';
-            currentRotation = 0;
+            if (!itemsText.trim()) {
+                document.getElementById('listResult').textContent = "Пожалуйста, введите элементы списка";
+                return;
+            }
             
-            resultValue.textContent = "—";
-            resultValue.style.color = "#ff9a00";
+            if (isNaN(count) || count < 1 || count > 10) {
+                document.getElementById('listResult').textContent = "Количество элементов должно быть от 1 до 10";
+                return;
+            }
+            
+            const items = itemsText.split('\n').filter(item => item.trim() !== '');
+            
+            if (items.length === 0) {
+                document.getElementById('listResult').textContent = "Список элементов пуст";
+                return;
+            }
+            
+            if (count > items.length) {
+                document.getElementById('listResult').textContent = `Запрошено ${count} элементов, но в списке только ${items.length}`;
+                return;
+            }
+            
+            // Выбираем случайные уникальные элементы
+            let selectedItems = [];
+            let availableItems = [...items];
+            
+            for (let i = 0; i < count; i++) {
+                const randomIndex = Math.floor(Math.random() * availableItems.length);
+                selectedItems.push(availableItems[randomIndex]);
+                availableItems.splice(randomIndex, 1);
+            }
+            
+            const resultText = count === 1 ? `Выбран: ${selectedItems[0]}` : `Выбраны: ${selectedItems.join(', ')}`;
+            document.getElementById('listResult').textContent = resultText;
+            
+            // Добавляем в историю
+            histories.list.unshift(resultText);
+            updateHistory('listHistory', histories.list);
+        });
+        
+        document.getElementById('clearList').addEventListener('click', function() {
+            document.getElementById('listResult').textContent = "Здесь будет результат";
+            histories.list = [];
+            updateHistory('listHistory', histories.list);
+        });
+        
+        // Рандомайзер даты
+        document.getElementById('generateDate').addEventListener('click', function() {
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+            const count = parseInt(document.getElementById('dateCount').value);
+            
+            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                document.getElementById('dateResult').textContent = "Пожалуйста, введите корректные даты";
+                return;
+            }
+            
+            if (startDate > endDate) {
+                document.getElementById('dateResult').textContent = "Начальная дата должна быть раньше конечной";
+                return;
+            }
+            
+            if (isNaN(count) || count < 1 || count > 10) {
+                document.getElementById('dateResult').textContent = "Количество дат должно быть от 1 до 10";
+                return;
+            }
+            
+            const startTime = startDate.getTime();
+            const endTime = endDate.getTime();
+            const diff = endTime - startTime;
+            
+            let results = [];
+            for (let i = 0; i < count; i++) {
+                const randomTime = startTime + Math.random() * diff;
+                const randomDate = new Date(randomTime);
+                results.push(randomDate.toLocaleDateString('ru-RU'));
+            }
+            
+            const resultText = count === 1 ? `Случайная дата: ${results[0]}` : `Случайные даты: ${results.join(', ')}`;
+            document.getElementById('dateResult').textContent = resultText;
+            
+            // Добавляем в историю
+            histories.date.unshift(resultText);
+            updateHistory('dateHistory', histories.date);
+        });
+        
+        document.getElementById('clearDate').addEventListener('click', function() {
+            document.getElementById('dateResult').textContent = "Здесь будет результат";
+            histories.date = [];
+            updateHistory('dateHistory', histories.date);
+        });
+        
+        // Генератор паролей
+        document.getElementById('generatePassword').addEventListener('click', function() {
+            const length = parseInt(document.getElementById('passwordLength').value);
+            const uppercase = document.getElementById('uppercase').checked;
+            const lowercase = document.getElementById('lowercase').checked;
+            const numbers = document.getElementById('numbers').checked;
+            const symbols = document.getElementById('symbols').checked;
+            
+            if (isNaN(length) || length < 4 || length > 50) {
+                document.getElementById('passwordResult').textContent = "Длина пароля должна быть от 4 до 50 символов";
+                return;
+            }
+            
+            if (!uppercase && !lowercase && !numbers && !symbols) {
+                document.getElementById('passwordResult').textContent = "Выберите хотя бы один тип символов";
+                return;
+            }
+            
+            const upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const lowerChars = 'abcdefghijklmnopqrstuvwxyz';
+            const numberChars = '0123456789';
+            const symbolChars = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+            
+            let allChars = '';
+            if (uppercase) allChars += upperChars;
+            if (lowercase) allChars += lowerChars;
+            if (numbers) allChars += numberChars;
+            if (symbols) allChars += symbolChars;
+            
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * allChars.length);
+                password += allChars[randomIndex];
+            }
+            
+            document.getElementById('passwordResult').textContent = `Сгенерированный пароль: ${password}`;
+            
+            // Добавляем в историю
+            histories.password.unshift(`Пароль: ${password}`);
+            updateHistory('passwordHistory', histories.password);
+        });
+        
+        document.getElementById('clearPassword').addEventListener('click', function() {
+            document.getElementById('passwordResult').textContent = "Здесь будет результат";
+            histories.password = [];
+            updateHistory('passwordHistory', histories.password);
+        });
+        
+        // Орел или решка
+        document.getElementById('flipCoin').addEventListener('click', function() {
+            const coin = document.getElementById('coin');
+            const result = Math.random() < 0.5 ? 'Орел' : 'Решка';
+            
+            // Анимация монетки
+            coin.style.transition = 'transform 0.6s';
+            coin.style.transform = 'rotateY(720deg)';
             
             setTimeout(() => {
-                wheel.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.21, 0.99)';
-            }, 1000);
+                coin.textContent = result === 'Орел' ? 'О' : 'Р';
+                document.getElementById('coinResult').textContent = `Результат: ${result}`;
+                
+                // Добавляем в историю
+                histories.coin.unshift(result);
+                updateHistory('coinHistory', histories.coin);
+                
+                // Сбрасываем анимацию
+                setTimeout(() => {
+                    coin.style.transition = 'none';
+                    coin.style.transform = 'rotateY(0deg)';
+                }, 100);
+            }, 600);
+        });
+        
+        document.getElementById('clearCoin').addEventListener('click', function() {
+            document.getElementById('coin').textContent = '?';
+            document.getElementById('coinResult').textContent = "Здесь будет результат";
+            histories.coin = [];
+            updateHistory('coinHistory', histories.coin);
+        });
+        
+        // Генератор цвета
+        document.getElementById('generateColor').addEventListener('click', function() {
+            // Генерация случайного цвета в HEX
+            const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+            
+            // Конвертация в RGB
+            const r = parseInt(randomColor.substr(1, 2), 16);
+            const g = parseInt(randomColor.substr(3, 2), 16);
+            const b = parseInt(randomColor.substr(5, 2), 16);
+            
+            // Отображение
+            document.getElementById('colorDisplay').style.backgroundColor = randomColor;
+            document.getElementById('colorResult').innerHTML = `HEX: ${randomColor.toUpperCase()}<br>RGB: ${r}, ${g}, ${b}`;
+            
+            // Добавляем в историю
+            histories.color.unshift(`HEX: ${randomColor.toUpperCase()}`);
+            updateHistory('colorHistory', histories.color);
+        });
+        
+        document.getElementById('clearColor').addEventListener('click', function() {
+            document.getElementById('colorDisplay').style.backgroundColor = '#4cc9f0';
+            document.getElementById('colorResult').innerHTML = 'HEX: #4cc9f0<br>RGB: 76, 201, 240';
+            histories.color = [];
+            updateHistory('colorHistory', histories.color);
+        });
+        
+        // Функция обновления истории
+        function updateHistory(elementId, historyArray) {
+            const element = document.getElementById(elementId);
+            if (historyArray.length === 0) {
+                element.innerHTML = '';
+                return;
+            }
+            
+            let html = '<strong>История:</strong><br>';
+            const displayCount = Math.min(historyArray.length, 5);
+            
+            for (let i = 0; i < displayCount; i++) {
+                html += `${i+1}. ${historyArray[i]}<br>`;
+            }
+            
+            element.innerHTML = html;
         }
         
-        // Обработчики событий
-        segmentCountInput.addEventListener('input', function() {
-            segmentCountValue.textContent = this.value;
-            segmentCount = parseInt(this.value);
-            
-            // Обновляем сегменты, если нужно добавить новые
-            while (segments.length < segmentCount) {
-                const randomColor = colorInputs[Math.floor(Math.random() * colorInputs.length)].value;
-                segments.push({
-                    name: `Приз ${segments.length + 1}`,
-                    color: randomColor
-                });
-            }
-            
-            // Удаляем лишние сегменты, если нужно
-            if (segments.length > segmentCount) {
-                segments = segments.slice(0, segmentCount);
-            }
-            
-            updateSegmentList();
-            renderWheel();
+        // Установка текущей даты по умолчанию
+        const today = new Date();
+        const nextYear = new Date();
+        nextYear.setFullYear(today.getFullYear() + 1);
+        
+        document.getElementById('startDate').value = today.toISOString().split('T')[0];
+        document.getElementById('endDate').value = nextYear.toISOString().split('T')[0];
+        
+        // Инициализация всех рандомайзеров при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            // Генерируем начальные значения
+            document.getElementById('generateColor').click();
         });
-        
-        colorInputs.forEach(input => {
-            input.addEventListener('change', function() {
-                // Обновляем цвета сегментов
-                segments.forEach((segment, index) => {
-                    const colorIndex = index % colorInputs.length;
-                    segment.color = colorInputs[colorIndex].value;
-                });
-                
-                renderWheel();
-                updateSegmentList();
-            });
-        });
-        
-        spinBtn.addEventListener('click', spinWheel);
-        resetBtn.addEventListener('click', resetWheel);
-        addSegmentBtn.addEventListener('click', addSegment);
-        
-        newSegmentNameInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                addSegment();
-            }
-        });
-        
-        // Инициализация при загрузке страницы
-        window.addEventListener('DOMContentLoaded', initWheel);
     </script>
 </body>
 </html>
