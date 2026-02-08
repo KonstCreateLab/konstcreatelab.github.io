@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "title": "Структура HTML-документа",
+    "category": "HTML",
+    "difficulty": "легкая",
+    "description": "Базовая разметка любого HTML-файла.",
+    "lockedContent": "<!DOCTYPE html>\\n<html lang='ru'>\\n<head>\\n  <meta charset='UTF-8'>\\n  <title>Документ</title>\\n</head>\\n<body>\\n  <!-- Контент -->\\n</body>\\n</html>",
+    "tags": ["база", "разметка", "шаблон"]
+  },
+  {
+    "id": 2,
+    "title": "Flexbox: основные свойства",
+    "category": "CSS",
+    "difficulty": "средняя",
+    "description": "Шпаргалка по основным свойствам Flexbox для контейнера и элементов.",
+    "lockedContent": ".container {\\n  display: flex;\\n  justify-content: center;\\n  align-items: center;\\n  flex-wrap: wrap;\\n}\\n.item {\\n  flex-grow: 1;\\n  flex-shrink: 1;\\n  flex-basis: 200px;\\n}",
+    "tags": ["верстка", "расположение", "responsive"]
+  },
+  {
+    "id": 3,
+    "title": "Деструктуризация массива и объекта",
+    "category": "JavaScript",
+    "difficulty": "средняя",
+    "description": "Синтаксис деструктуризации в ES6+.",
+    "lockedContent": "// Массив\\nconst [first, second] = array;\\n// Объект\\nconst { name, age } = obj;\\n// Переименование\\nconst { name: userName } = obj;\\n// Значение по умолчанию\\nconst { role = 'user' } = obj;",
+    "tags": ["es6", "синтаксис", "удобно"]
+  },
+  {
+    "id": 4,
+    "title": "useState и useEffect",
+    "category": "React",
+    "difficulty": "средняя",
+    "description": "Хуки для состояния и побочных эффектов в React.",
+    "lockedContent": "import { useState, useEffect } from 'react';\\n\\nfunction Example() {\\n  const [count, setCount] = useState(0);\\n\\n  useEffect(() => {\\n    document.title = `Вы нажали ${count} раз`;\\n    return () => {\\n      // cleanup\\n    };\\n  }, [count]); // Зависимости\\n\\n  return (\\n    <button onClick={() => setCount(count + 1)}>\\n      {count}\\n    </button>\\n  );\\n}",
+    "tags": ["хуки", "состояние", "эффекты"]
+  },
+  {
+    "id": 5,
+    "title": "Основные команды Git",
+    "category": "Git",
+    "difficulty": "легкая",
+    "description": "Повседневные команды для работы с репозиторием.",
+    "lockedContent": "git init\\ngit clone <url>\\ngit add .\\ngit commit -m 'сообщение'\\ngit push origin main\\ngit pull origin main\\ngit branch\\ngit checkout -b new-branch",
+    "tags": ["контроль версий", "база", "команды"]
+  }
+]
